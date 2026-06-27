@@ -405,9 +405,10 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <script>
-const JOB_KEY='ekzen_kaynak_hesap_v7_jobs';
-const CASH_KEY='ekzen_kaynak_hesap_v7_cash';
-const SET_KEY='ekzen_kaynak_hesap_v7_settings';
+const JOB_KEY='ekzen_kaynak_hesap_v8_jobs';
+const CASH_KEY='ekzen_kaynak_hesap_v8_cash';
+const SET_KEY='ekzen_kaynak_hesap_v8_settings';
+const MIGRATION_KEY='ekzen_kaynak_hesap_v8_migrated';
 
 const defaultSettings={
 title:'Ekzen Teknik - Hakediş Takip',
@@ -419,25 +420,56 @@ statuses:['Hesaplaşılmadı','Hesaplaşıldı','Ödendi','İptal'],
 paymentTypes:['Nakit','IBAN','Kredi Kartı / POS','Alınmadı']
 };
 
-let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v6_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v5_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
+const migratedBefore=localStorage.getItem(MIGRATION_KEY)==='yes';
+
 let jobs=JSON.parse(localStorage.getItem(JOB_KEY)||'[]');
-
-if(jobs.length===0 && oldJobs.length>0){
-jobs=oldJobs.map(j=>({...j,customerInfo:j.customerInfo||[j.customer,j.phone,j.address].filter(Boolean).join(' - ')}));
-localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
-}
-
-let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v6_cash')||localStorage.getItem('ekzen_kaynak_hesap_v5_cash')||localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
 let cashMoves=JSON.parse(localStorage.getItem(CASH_KEY)||'[]');
 
-if(cashMoves.length===0 && oldCash.length>0){
-cashMoves=oldCash;
-localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
+if(!migratedBefore){
+  const oldJobs=JSON.parse(
+    localStorage.getItem('ekzen_kaynak_hesap_v7_jobs')||
+    localStorage.getItem('ekzen_kaynak_hesap_v6_jobs')||
+    localStorage.getItem('ekzen_kaynak_hesap_v5_jobs')||
+    localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||
+    localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||
+    localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||
+    '[]'
+  );
+
+  const oldCash=JSON.parse(
+    localStorage.getItem('ekzen_kaynak_hesap_v7_cash')||
+    localStorage.getItem('ekzen_kaynak_hesap_v6_cash')||
+    localStorage.getItem('ekzen_kaynak_hesap_v5_cash')||
+    localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||
+    localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||
+    '[]'
+  );
+
+  if(jobs.length===0 && oldJobs.length>0){
+    jobs=oldJobs.map(j=>({...j,customerInfo:j.customerInfo||[j.customer,j.phone,j.address].filter(Boolean).join(' - ')}));
+    localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
+  }
+
+  if(cashMoves.length===0 && oldCash.length>0){
+    cashMoves=oldCash;
+    localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
+  }
+
+  localStorage.setItem(MIGRATION_KEY,'yes');
 }
 
 let settings={
 ...defaultSettings,
-...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v6_settings')||localStorage.getItem('ekzen_kaynak_hesap_v5_settings')||localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
+...JSON.parse(
+  localStorage.getItem(SET_KEY)||
+  localStorage.getItem('ekzen_kaynak_hesap_v7_settings')||
+  localStorage.getItem('ekzen_kaynak_hesap_v6_settings')||
+  localStorage.getItem('ekzen_kaynak_hesap_v5_settings')||
+  localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||
+  localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||
+  localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||
+  '{}'
+)
 };
 
 const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
@@ -470,9 +502,7 @@ if(tab==='home') render();
 window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function toggleSourcePanel(){
-el('sourcePanel').classList.toggle('hidden');
-}
+function toggleSourcePanel(){el('sourcePanel').classList.toggle('hidden')}
 
 function showDetails(){
 el('detailPanel').classList.remove('hidden');
@@ -485,9 +515,7 @@ el('fSource').value=el('homeSourceSelect').value;
 render();
 }
 
-function syncHomeSourceFromFilter(){
-el('homeSourceSelect').value=el('fSource').value;
-}
+function syncHomeSourceFromFilter(){el('homeSourceSelect').value=el('fSource').value}
 
 function applySettings(){
 el('appTitle').textContent=settings.title;
@@ -811,7 +839,8 @@ showTab('jobEntry');
 function delJob(id){
 if(confirm('Bu iş kaydını silmek istiyor musun?')){
 jobs=jobs.filter(x=>x.id!==id);
-saveJobs();render();
+saveJobs();
+render();
 }
 }
 
@@ -834,7 +863,11 @@ createdAt:new Date().toISOString()
 
 const i=cashMoves.findIndex(x=>x.id===item.id);
 if(i>-1)cashMoves[i]=item;else cashMoves.unshift(item);
-saveCash();clearCashForm();renderCashPage();render();showTab('home');
+saveCash();
+clearCashForm();
+renderCashPage();
+render();
+showTab('home');
 }
 
 function clearCashForm(){
@@ -908,14 +941,20 @@ showTab('cash');
 function delCashMove(id){
 if(confirm('Bu kasa hareketini silmek istiyor musun?')){
 cashMoves=cashMoves.filter(x=>x.id!==id);
-saveCash();renderCashPage();render();
+saveCash();
+renderCashPage();
+render();
 }
 }
 
 function resetAll(){
 if(confirm('Tüm iş kayıtları ve kasa hareketleri silinecek. Emin misin?')){
-jobs=[];cashMoves=[];
-saveJobs();saveCash();render();renderCashPage();
+jobs=[];
+cashMoves=[];
+saveJobs();
+saveCash();
+render();
+renderCashPage();
 }
 }
 
