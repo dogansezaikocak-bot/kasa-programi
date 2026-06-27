@@ -46,6 +46,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .done{background:#dcfae6;color:#067647}.pending{background:#fff4cc;color:#8a6100}.paid{background:#e0eaff;color:#1849a9}.cancel{background:#fee4e2;color:#b42318}
 .cashin{background:#dcfae6;color:#067647}.cashout{background:#fee4e2;color:#b42318}
+.cashmaterial{background:#fef3c7;color:#92400e}.cashhakedis{background:#ede9fe;color:#5b21b6}
 .muted{color:var(--muted);font-size:12px}
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
 .summary .box{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px;min-width:0}
@@ -302,7 +303,22 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 <div>
 <label>İş Kaynağı</label>
-<select id="cashSource"></select>
+<select id="cashSource" onchange="updateCashSourceBalance()"></select>
+</div>
+</div>
+
+<div class="summary">
+<div class="box">
+<small>Seçili Kaynak Ödeme Yapılacak</small>
+<b id="cashSourceBalance" class="warn">₺0</b>
+</div>
+<div class="box">
+<small>Seçili Kaynak Hakediş</small>
+<b id="cashSourceShare" class="warn">₺0</b>
+</div>
+<div class="box">
+<small>Seçili Kaynak Kasa Eksi</small>
+<b id="cashSourceOut" class="danger">₺0</b>
 </div>
 </div>
 
@@ -312,6 +328,8 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <select id="cashType">
 <option value="in">Para Girişi</option>
 <option value="out">Ekstra Gider</option>
+<option value="material">Malzeme</option>
+<option value="hakedis">Hakediş</option>
 </select>
 </div>
 <div>
@@ -339,6 +357,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <button class="light" onclick="clearCashForm()">Temizle</button>
 <button class="light" onclick="showTab('home')">Ana Sayfaya Dön</button>
 </div>
+<p class="footer">Para Girişi artı çalışır. Ekstra Gider, Malzeme ve Hakediş kasa hareketinde eksi çalışır.</p>
 </div>
 
 <div class="card">
@@ -352,6 +371,8 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <option value="">Tüm hareketler</option>
 <option value="in">Para Girişi</option>
 <option value="out">Ekstra Gider</option>
+<option value="material">Malzeme</option>
+<option value="hakedis">Hakediş</option>
 </select>
 <select id="cfPayment" onchange="renderCashPage()"></select>
 <input id="cfSearch" oninput="renderCashPage()" placeholder="Ara: açıklama, kategori">
@@ -359,7 +380,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 
 <div class="summary">
 <div class="box"><small>Para Girişi</small><b id="cashPageIn" class="ok">₺0</b></div>
-<div class="box"><small>Ekstra Gider</small><b id="cashPageOut" class="danger">₺0</b></div>
+<div class="box"><small>Kasa Eksi</small><b id="cashPageOut" class="danger">₺0</b></div>
 <div class="box"><small>Net Hareket</small><b id="cashPageNet">₺0</b></div>
 </div>
 
@@ -475,6 +496,21 @@ function saveJobs(){localStorage.setItem(JOB_KEY,JSON.stringify(jobs))}
 function saveCash(){localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves))}
 function saveSettings(){localStorage.setItem(SET_KEY,JSON.stringify(settings))}
 
+function isCashIn(x){return x.type==='in'}
+function isCashOut(x){return x.type!=='in'}
+function cashTypeText(type){
+  if(type==='in') return 'Para Girişi';
+  if(type==='material') return 'Malzeme';
+  if(type==='hakedis') return 'Hakediş';
+  return 'Ekstra Gider';
+}
+function cashTypeClass(type){
+  if(type==='in') return 'cashin';
+  if(type==='material') return 'cashmaterial';
+  if(type==='hakedis') return 'cashhakedis';
+  return 'cashout';
+}
+
 function showTab(tab){
 el('homePage').classList.toggle('hidden',tab!=='home');
 el('jobListPage').classList.toggle('hidden',tab!=='jobList');
@@ -488,7 +524,7 @@ el('tabCashBtn').classList.toggle('active',tab==='cash');
 el('tabSettingsBtn').classList.toggle('active',tab==='settings');
 
 if(tab==='settings') renderSettings();
-if(tab==='cash') renderCashPage();
+if(tab==='cash'){renderCashPage();updateCashSourceBalance()}
 if(tab==='jobList') renderJobListPage();
 if(tab==='newJob') renderJobEntryCards();
 if(tab==='home') render();
@@ -563,7 +599,7 @@ settings.subtitle=val('setSubtitle')||defaultSettings.subtitle;
 settings.defaultRate=Number(val('setDefaultRate')||50);
 if(settings.defaultRate<0)settings.defaultRate=0;
 if(settings.defaultRate>100)settings.defaultRate=100;
-saveSettings();applySettings();render();renderCashPage();renderJobListPage();
+saveSettings();applySettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
 alert('Genel ayarlar kaydedildi.');
 }
 
@@ -573,7 +609,7 @@ if(!value){alert('Boş kayıt eklenemez.');return}
 if(settings[type].includes(value)){alert('Bu kayıt zaten var.');return}
 settings[type].push(value);
 el(inputId).value='';
-saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
 }
 
 function editSettingItem(type,index){
@@ -595,7 +631,7 @@ jobs.forEach(j=>{if(j.paymentType===oldValue)j.paymentType=clean});
 cashMoves.forEach(c=>{if(c.paymentType===oldValue)c.paymentType=clean});
 }
 
-saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
+saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
 }
 
 function deleteSettingItem(type,index){
@@ -603,7 +639,7 @@ const value=settings[type][index];
 if(settings[type].length<=1){alert('En az 1 kayıt kalmalı.');return}
 if(!confirm(value+' silinsin mi? Eski kayıtlardan silinmez; sadece seçim listesinden kalkar.'))return;
 settings[type].splice(index,1);
-saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
 }
 
 function renderSettings(){
@@ -628,7 +664,7 @@ el(listId).innerHTML=settings[type].map((item,index)=>`
 function resetSettings(){
 if(!confirm('Ayarlar varsayılana dönecek. İş ve kasa kayıtların silinmez. Emin misin?'))return;
 settings={...defaultSettings};
-saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
 }
 
 function calc(j){
@@ -639,6 +675,34 @@ const net=Math.max(collection-material,0);
 const sourceShare=net*rate/100;
 const myShare=net-sourceShare;
 return{collection,material,rate,net,sourceShare,myShare};
+}
+
+function sourceBalance(source){
+let hak=0,cashIn=0,cashOut=0;
+
+jobs.filter(x=>x.status!=='İptal' && (!source || x.source===source)).forEach(x=>{
+  hak+=calc(x).sourceShare;
+});
+
+cashMoves.filter(x=>(!source || x.source===source)).forEach(x=>{
+  if(isCashIn(x)) cashIn+=Number(x.amount||0);
+  if(isCashOut(x)) cashOut+=Number(x.amount||0);
+});
+
+return {
+  hak,
+  cashIn,
+  cashOut,
+  balance: hak + cashIn - cashOut
+};
+}
+
+function updateCashSourceBalance(){
+const src=val('cashSource');
+const b=sourceBalance(src);
+el('cashSourceBalance').textContent=fmt(b.balance);
+el('cashSourceShare').textContent=fmt(b.hak);
+el('cashSourceOut').textContent=fmt(b.cashOut);
 }
 
 function saveJob(){
@@ -670,6 +734,7 @@ clearForm();
 render();
 renderJobListPage();
 renderJobEntryCards();
+updateCashSourceBalance();
 showTab('jobList');
 }
 
@@ -728,11 +793,11 @@ mobile.appendChild(jobCard(x,c));
 });
 
 cashRows.forEach(x=>{
-if(x.type==='in')cashIn+=Number(x.amount||0);
-if(x.type==='out')cashOut+=Number(x.amount||0);
+if(isCashIn(x))cashIn+=Number(x.amount||0);
+if(isCashOut(x))cashOut+=Number(x.amount||0);
 
-const cls=x.type==='in'?'cashin':'cashout';
-const typeText=x.type==='in'?'Para Girişi':'Ekstra Gider';
+const cls=cashTypeClass(x.type);
+const typeText=cashTypeText(x.type);
 
 const tr=document.createElement('tr');
 tr.innerHTML=`
@@ -741,7 +806,7 @@ tr.innerHTML=`
 <td><span class="pill ${cls}">${typeText}</span></td>
 <td>${esc(x.note)||'-'}<br><span class="muted">${esc(x.category)||''}</span></td>
 <td>${esc(x.paymentType)||''}</td>
-<td class="right ${x.type==='in'?'ok':'danger'}"><b>${fmt(x.amount)}</b></td>`;
+<td class="right ${isCashIn(x)?'ok':'danger'}"><b>${isCashIn(x)?fmt(x.amount):'- '+fmt(x.amount)}</b></td>`;
 cashReportTb.appendChild(tr);
 
 const card=document.createElement('div');
@@ -750,7 +815,7 @@ card.innerHTML=`
 <div class="job-card-top"><div><h3>${esc(x.source)}</h3><p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p></div><span class="pill ${cls}">${typeText}</span></div>
 <p><b>Kategori:</b> ${esc(x.category)||'-'}</p>
 <p><b>Açıklama:</b> ${esc(x.note)||'-'}</p>
-<div class="money-grid"><div><small>Tutar</small><b class="${x.type==='in'?'ok':'danger'}">${fmt(x.amount)}</b></div></div>`;
+<div class="money-grid"><div><small>Tutar</small><b class="${isCashIn(x)?'ok':'danger'}">${isCashIn(x)?fmt(x.amount):'- '+fmt(x.amount)}</b></div></div>`;
 cashReportMobile.appendChild(card);
 });
 
@@ -843,8 +908,8 @@ tc+=c.collection;tm+=c.material;hak+=c.sourceShare;
 });
 
 cashMoves.filter(x=>(!src || x.source===src)).forEach(x=>{
-if(x.type==='in')cashIn+=Number(x.amount||0);
-if(x.type==='out')cashOut+=Number(x.amount||0);
+if(isCashIn(x))cashIn+=Number(x.amount||0);
+if(isCashOut(x))cashOut+=Number(x.amount||0);
 });
 
 const ekstraGider=cashOut-cashIn;
@@ -883,6 +948,7 @@ saveJobs();
 render();
 renderJobListPage();
 renderJobEntryCards();
+updateCashSourceBalance();
 }
 }
 
@@ -909,6 +975,7 @@ saveCash();
 clearCashForm();
 renderCashPage();
 render();
+updateCashSourceBalance();
 showTab('home');
 }
 
@@ -918,6 +985,7 @@ el('cashDate').value=today();
 el('cashSource').value=settings.sources[0]||'';
 el('cashType').value='in';
 el('cashPaymentType').value=settings.paymentTypes[0]||'';
+updateCashSourceBalance();
 }
 
 function filteredCashPage(){
@@ -935,16 +1003,17 @@ tb.innerHTML='';mobile.innerHTML='';
 let cashIn=0,cashOut=0;
 
 rows.forEach(x=>{
-if(x.type==='in')cashIn+=Number(x.amount||0);
-if(x.type==='out')cashOut+=Number(x.amount||0);
-const cls=x.type==='in'?'cashin':'cashout';
-const typeText=x.type==='in'?'Para Girişi':'Ekstra Gider';
+if(isCashIn(x))cashIn+=Number(x.amount||0);
+if(isCashOut(x))cashOut+=Number(x.amount||0);
+
+const cls=cashTypeClass(x.type);
+const typeText=cashTypeText(x.type);
 
 const tr=document.createElement('tr');
 tr.innerHTML=`
 <td>${esc(x.date)}</td><td><b>${esc(x.source)}</b></td><td><span class="pill ${cls}">${typeText}</span></td>
 <td>${esc(x.category)||'-'}</td><td>${esc(x.note)||'-'}</td><td>${esc(x.paymentType)||''}</td>
-<td class="right ${x.type==='in'?'ok':'danger'}"><b>${fmt(x.amount)}</b></td>
+<td class="right ${isCashIn(x)?'ok':'danger'}"><b>${isCashIn(x)?fmt(x.amount):'- '+fmt(x.amount)}</b></td>
 <td class="no-print"><button class="light" onclick="editCashMove('${x.id}')">Düzenle</button><button class="red" onclick="delCashMove('${x.id}')">Sil</button></td>`;
 tb.appendChild(tr);
 
@@ -954,7 +1023,7 @@ card.innerHTML=`
 <div class="job-card-top"><div><h3>${esc(x.source)}</h3><p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p></div><span class="pill ${cls}">${typeText}</span></div>
 <p><b>Kategori:</b> ${esc(x.category)||'-'}</p>
 <p><b>Açıklama:</b> ${esc(x.note)||'-'}</p>
-<div class="money-grid"><div><small>Tutar</small><b class="${x.type==='in'?'ok':'danger'}">${fmt(x.amount)}</b></div></div>
+<div class="money-grid"><div><small>Tutar</small><b class="${isCashIn(x)?'ok':'danger'}">${isCashIn(x)?fmt(x.amount):'- '+fmt(x.amount)}</b></div></div>
 <div class="btns no-print"><button class="light" onclick="editCashMove('${x.id}')">Düzenle</button><button class="red" onclick="delCashMove('${x.id}')">Sil</button></div>`;
 mobile.appendChild(card);
 });
@@ -964,6 +1033,7 @@ el('cashPageIn').textContent=fmt(cashIn);
 el('cashPageOut').textContent=fmt(cashOut);
 el('cashPageNet').textContent=fmt(net);
 el('cashPageNet').className=net>=0?'ok':'danger';
+updateCashSourceBalance();
 }
 
 function editCashMove(id){
@@ -977,6 +1047,7 @@ el('cashAmount').value=x.amount;
 el('cashPaymentType').value=x.paymentType;
 el('cashCategory').value=x.category||'';
 el('cashNote').value=x.note||'';
+updateCashSourceBalance();
 showTab('cash');
 }
 
@@ -986,6 +1057,7 @@ cashMoves=cashMoves.filter(x=>x.id!==id);
 saveCash();
 renderCashPage();
 render();
+updateCashSourceBalance();
 }
 }
 
@@ -998,6 +1070,7 @@ saveCash();
 render();
 renderCashPage();
 renderJobListPage();
+updateCashSourceBalance();
 }
 }
 
@@ -1019,7 +1092,7 @@ function exportCSV(){
 const jobRows=filteredJobs();
 const cashRows=filteredCashForReport();
 const rows=[];
-rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Masraf','Net','Hakediş','Para Girişi','Ekstra Gider','Durum','Ödeme Şekli']);
+rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Masraf','Net','Hakediş','Para Girişi','Kasa Eksi','Durum','Ödeme Şekli']);
 
 jobRows.forEach(x=>{
 const c=calc(x);
@@ -1027,7 +1100,7 @@ rows.push(['İş Kaydı',x.date,x.source,x.serviceType,`${x.customerInfo||''} ${
 });
 
 cashRows.forEach(x=>{
-rows.push(['Kasa Hareketi',x.date,x.source,x.type==='in'?'Para Girişi':'Ekstra Gider',`${x.category||''} ${x.note||''}`,'','','','',x.type==='in'?x.amount:'',x.type==='out'?x.amount:'', '',x.paymentType]);
+rows.push(['Kasa Hareketi',x.date,x.source,cashTypeText(x.type),`${x.category||''} ${x.note||''}`,'','','','',isCashIn(x)?x.amount:'',isCashOut(x)?x.amount:'', '',x.paymentType]);
 });
 
 const csv=rows.map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
