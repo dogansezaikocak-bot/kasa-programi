@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sezai Usta Kasa Programı</title>
+  <style>
+    :root{--bg:#f6f7f9;--card:#fff;--text:#1d2433;--muted:#667085;--border:#d9dee8;--primary:#0f62fe;--danger:#d92d20;--ok:#039855;--warn:#dc6803;}
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    header{background:#111827;color:#fff;padding:18px 22px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    header h1{font-size:22px;margin:0} header p{margin:4px 0 0;color:#cbd5e1;font-size:13px}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+    .stat small{color:var(--muted)} .stat b{display:block;font-size:24px;margin-top:8px}.ok{color:var(--ok)}.danger{color:var(--danger)}.warn{color:var(--warn)}
+    .layout{display:grid;grid-template-columns:380px 1fr;gap:14px;margin-top:14px} label{display:block;font-size:13px;color:#344054;margin:10px 0 5px} input,select,textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:14px;background:#fff} textarea{min-height:68px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer} .primary{background:var(--primary);color:white}.light{background:#eef2f7;color:#182230}.red{background:#fee4e2;color:#b42318}.green{background:#dcfae6;color:#067647}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    table{width:100%;border-collapse:collapse;font-size:14px} th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top} th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0} .tablebox{max-height:520px;overflow:auto;border:1px solid var(--border);border-radius:12px}.filters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}.income{background:#dcfae6;color:#067647}.expense{background:#fee4e2;color:#b42318}.transfer{background:#e0eaff;color:#1849a9}.muted{color:var(--muted);font-size:13px}.right{text-align:right}.hide{display:none}.footer{color:#667085;font-size:12px;margin-top:14px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.hide-mobile{display:none}}
+    @media print{header,.formcard,.filters,.btns,.footer{display:none}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.layout{display:block}.tablebox{max-height:none;overflow:visible;border:0}body{background:#fff}}
+  </style>
+</head>
+<body>
+<header>
+  <div><h1>Sezai Usta Kasa Programı</h1><p>Günlük kasa, banka, tahsilat, ödeme ve müşteri iş takibi</p></div>
+  <div class="btns"><button class="light" onclick="print()">Yazdır / PDF</button><button class="light" onclick="exportCSV()">CSV Aktar</button><button class="red" onclick="resetAll()">Tümünü Sil</button></div>
+</header>
+<div class="wrap">
+  <section class="grid">
+    <div class="card stat"><small>Toplam Nakit Kasa</small><b id="cashTotal">₺0</b></div>
+    <div class="card stat"><small>Toplam Banka / Kart</small><b id="bankTotal">₺0</b></div>
+    <div class="card stat"><small>Bu Ay Net</small><b id="monthNet">₺0</b></div>
+    <div class="card stat"><small>Bugünkü Net</small><b id="todayNet">₺0</b></div>
+  </section>
+
+  <section class="layout">
+    <div class="card formcard">
+      <h2 style="margin-top:0;font-size:18px">Yeni Kayıt</h2>
+      <input type="hidden" id="editId" />
+
+      <div class="row">
+        <div>
+          <label>Tarih</label>
+          <input type="date" id="date">
+        </div>
+        <div>
+          <label>İşlem Türü</label>
+          <select id="type">
+            <option value="income">Gelir / Tahsilat</option>
+            <option value="expense">Gider / Ödeme</option>
+            <option value="transfer">Virman / Aktarma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Hesap</label>
+          <select id="account">
+            <option>Nakit Kasa</option>
+            <option>Banka</option>
+            <option>Kredi Kartı / POS</option>
+            <option>IBAN Havale</option>
+          </select>
+        </div>
+        <div>
+          <label>Tutar</label>
+          <input type="number" id="amount" placeholder="Örn: 1500" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Kategori</label>
+          <select id="category">
+            <option>Servis Ücreti</option>
+            <option>Parça Satışı</option>
+            <option>Bakım</option>
+            <option>Yol Ücreti</option>
+            <option>Parça Alımı</option>
+            <option>Yakıt</option>
+            <option>Yemek</option>
+            <option>Telefon / İnternet</option>
+            <option>Kira</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+        <div>
+          <label>Ödeme Durumu</label>
+          <select id="status">
+            <option>Ödendi</option>
+            <option>Bekliyor</option>
+            <option>Kısmi</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Müşteri / Tedarikçi</label>
+      <input id="person" placeholder="Örn: Ahmet Yılmaz / Parçacı" />
+
+      <label>Telefon</label>
+      <input id="phone" placeholder="05xx xxx xx xx" />
+
+      <label>Açıklama</label>
+      <textarea id="note" placeholder="Örn: Vaillant kombi F1 arızası, anakart kontrol edildi"></textarea>
+
+      <div class="btns">
+        <button class="primary" onclick="saveTx()">Kaydet</button>
+        <button class="light" onclick="clearForm()">Temizle</button>
+      </div>
+
+      <p class="footer">Kayıtlar bu cihazın tarayıcısında saklanır. Başka bilgisayara geçerken CSV dışa aktar.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;font-size:18px">Kasa Hareketleri</h2>
+
+      <div class="filters">
+        <input type="date" id="fStart" onchange="render()">
+        <input type="date" id="fEnd" onchange="render()">
+        <select id="fType" onchange="render()">
+          <option value="">Tüm türler</option>
+          <option value="income">Gelir</option>
+          <option value="expense">Gider</option>
+          <option value="transfer">Virman</option>
+        </select>
+        <select id="fAccount" onchange="render()">
+          <option value="">Tüm hesaplar</option>
+          <option>Nakit Kasa</option>
+          <option>Banka</option>
+          <option>Kredi Kartı / POS</option>
+          <option>IBAN Havale</option>
+        </select>
+        <input id="fSearch" oninput="render()" placeholder="Ara: müşteri, not...">
+      </div>
+
+      <div class="tablebox">
+        <table>
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Tür</th>
+              <th>Hesap</th>
+              <th>Kategori</th>
+              <th>Kişi</th>
+              <th class="right">Tutar</th>
+              <th class="hide-mobile">Not</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <p class="muted" id="countText"></p>
+    </div>
+  </section>
+</div>
+
+<script>
+const KEY='sezai_kasa_v1';
+const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
+const today = () => new Date().toISOString().slice(0,10);
+let txs = JSON.parse(localStorage.getItem(KEY)||'[]');
+
+document.getElementById('date').value=today();
+
+function persist(){
+  localStorage.setItem(KEY,JSON.stringify(txs));
+}
+
+function val(id){
+  return document.getElementById(id).value.trim();
+}
+
+function saveTx(){
+  const amount=parseFloat(val('amount'));
+  if(!val('date')||!amount||amount<=0){
+    alert('Tarih ve tutar zorunlu.');
+    return;
+  }
+
+  const item={
+    id:val('editId')||crypto.randomUUID(),
+    date:val('date'),
+    type:val('type'),
+    account:val('account'),
+    amount,
+    category:val('category'),
+    status:val('status'),
+    person:val('person'),
+    phone:val('phone'),
+    note:val('note'),
+    createdAt:new Date().toISOString()
+  };
+
+  const i=txs.findIndex(x=>x.id===item.id);
+  if(i>-1) txs[i]=item;
+  else txs.unshift(item);
+
+  persist();
+  clearForm();
+  render();
+}
+
+function clearForm(){
+  ['editId','amount','person','phone','note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('date').value=today();
+  document.getElementById('type').value='income';
+  document.getElementById('account').value='Nakit Kasa';
+  document.getElementById('category').value='Servis Ücreti';
+  document.getElementById('status').value='Ödendi';
+}
+
+function sign(x){
+  return x.type==='expense'?-x.amount:x.type==='income'?x.amount:0;
+}
+
+function filtered(){
+  const s=val('fStart'),
+        e=val('fEnd'),
+        t=val('fType'),
+        a=val('fAccount'),
+        q=val('fSearch').toLowerCase();
+
+  return txs.filter(x=>
+    (!s||x.date>=s)&&
+    (!e||x.date<=e)&&
+    (!t||x.type===t)&&
+    (!a||x.account===a)&&
+    (!q||[x.person,x.phone,x.note,x.category,x.status].join(' ').toLowerCase().includes(q))
+  ).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+}
+
+function render(){
+  const rows=filtered();
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML='';
+
+  rows.forEach(x=>{
+    const cls=x.type==='income'?'income':x.type==='expense'?'expense':'transfer';
+    const name=x.type==='income'?'Gelir':x.type==='expense'?'Gider':'Virman';
+    const tr=document.createElement('tr');
+
+    tr.innerHTML=`
+      <td>${x.date}</td>
+      <td><span class="pill ${cls}">${name}</span><br><span class="muted">${x.status}</span></td>
+      <td>${x.account}</td>
+      <td>${x.category}</td>
+      <td>${x.person||'-'}<br><span class="muted">${x.phone||''}</span></td>
+      <td class="right ${x.type==='expense'?'danger':x.type==='income'?'ok':''}">${fmt(x.amount)}</td>
+      <td class="hide-mobile">${x.note||''}</td>
+      <td>
+        <button class="light" onclick="editTx('${x.id}')">Düzenle</button>
+        <button class="red" onclick="delTx('${x.id}')">Sil</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('countText').textContent=`${rows.length} kayıt listeleniyor.`;
+  updateStats();
+}
+
+function updateStats(){
+  const m=new Date().toISOString().slice(0,7);
+  const d=today();
+
+  let cash=0,bank=0,month=0,day=0;
+
+  txs.forEach(x=>{
+    const v=sign(x);
+
+    if(x.account==='Nakit Kasa') cash+=v;
+    else bank+=v;
+
+    if(x.date.slice(0,7)===m) month+=v;
+    if(x.date===d) day+=v;
+  });
+
+  document.getElementById('cashTotal').textContent=fmt(cash);
+  document.getElementById('bankTotal').textContent=fmt(bank);
+  document.getElementById('monthNet').textContent=fmt(month);
+  document.getElementById('todayNet').textContent=fmt(day);
+}
+
+function editTx(id){
+  const x=txs.find(x=>x.id===id);
+  if(!x)return;
+
+  ['editId','date','type','account','amount','category','status','person','phone','note']
+    .forEach(k=>document.getElementById(k).value=x[k]??'');
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function delTx(id){
+  if(confirm('Bu kaydı silmek istiyor musun?')){
+    txs=txs.filter(x=>x.id!==id);
+    persist();
+    render();
+  }
+}
+
+function resetAll(){
+  if(confirm('Tüm kasa kayıtları silinecek. Emin misin?')){
+    txs=[];
+    persist();
+    render();
+  }
+}
+
+function exportCSV(){
+  const rows=filtered();
+  const head=['Tarih','Tür','Hesap','Kategori','Durum','Müşteri/Tedarikçi','Telefon','Tutar','Not'];
+
+  const csv=[head,...rows.map(x=>[
+    x.date,x.type,x.account,x.category,x.status,x.person,x.phone,x.amount,x.note
+  ])].map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
+
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='kasa-kayitlari.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+render();
+</script>
+</body>
+</html>
