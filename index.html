@@ -3,38 +3,105 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sezai Usta Kasa Programı</title>
+  <title>Ekzen Teknik - İş Kaynağı Hesap Takip</title>
   <style>
-    :root{--bg:#f6f7f9;--card:#fff;--text:#1d2433;--muted:#667085;--border:#d9dee8;--primary:#0f62fe;--danger:#d92d20;--ok:#039855;--warn:#dc6803;}
-    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    header{background:#111827;color:#fff;padding:18px 22px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    header h1{font-size:22px;margin:0} header p{margin:4px 0 0;color:#cbd5e1;font-size:13px}
-    .wrap{max-width:1200px;margin:0 auto;padding:18px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
-    .stat small{color:var(--muted)} .stat b{display:block;font-size:24px;margin-top:8px}.ok{color:var(--ok)}.danger{color:var(--danger)}.warn{color:var(--warn)}
-    .layout{display:grid;grid-template-columns:380px 1fr;gap:14px;margin-top:14px} label{display:block;font-size:13px;color:#344054;margin:10px 0 5px} input,select,textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:14px;background:#fff} textarea{min-height:68px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer} .primary{background:var(--primary);color:white}.light{background:#eef2f7;color:#182230}.red{background:#fee4e2;color:#b42318}.green{background:#dcfae6;color:#067647}.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    table{width:100%;border-collapse:collapse;font-size:14px} th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top} th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0} .tablebox{max-height:520px;overflow:auto;border:1px solid var(--border);border-radius:12px}.filters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}.income{background:#dcfae6;color:#067647}.expense{background:#fee4e2;color:#b42318}.transfer{background:#e0eaff;color:#1849a9}.muted{color:var(--muted);font-size:13px}.right{text-align:right}.hide{display:none}.footer{color:#667085;font-size:12px;margin-top:14px}
-    @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.hide-mobile{display:none}}
-    @media print{header,.formcard,.filters,.btns,.footer{display:none}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.layout{display:block}.tablebox{max-height:none;overflow:visible;border:0}body{background:#fff}}
+    :root{
+      --bg:#f4f6f8;--card:#fff;--text:#172033;--muted:#667085;--border:#d9dee8;
+      --primary:#0f62fe;--dark:#111827;--danger:#d92d20;--ok:#039855;--warn:#dc6803;--soft:#f8fafc;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    header{background:var(--dark);color:white;padding:18px 22px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    header h1{font-size:22px;margin:0} header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
+    .wrap{max-width:1280px;margin:0 auto;padding:18px}
+    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+    .stat small{color:var(--muted);font-size:12px}
+    .stat b{display:block;font-size:22px;margin-top:8px}
+    .ok{color:var(--ok)}.danger{color:var(--danger)}.warn{color:var(--warn)}
+    .layout{display:grid;grid-template-columns:390px 1fr;gap:14px;margin-top:14px}
+    label{display:block;font-size:13px;color:#344054;margin:10px 0 5px}
+    input,select,textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:14px;background:white}
+    textarea{min-height:72px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
+    .primary{background:var(--primary);color:white}
+    .light{background:#eef2f7;color:#182230}
+    .red{background:#fee4e2;color:#b42318}
+    .green{background:#dcfae6;color:#067647}
+    .orange{background:#ffead5;color:#9a3412}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+    th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0}
+    .right{text-align:right}
+    .tablebox{max-height:570px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+    .filters{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+    .done{background:#dcfae6;color:#067647}
+    .pending{background:#fff4cc;color:#8a6100}
+    .paid{background:#e0eaff;color:#1849a9}
+    .cancel{background:#fee4e2;color:#b42318}
+    .muted{color:var(--muted);font-size:12px}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0}
+    .summary .box{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px}
+    .summary .box small{color:var(--muted)}
+    .summary .box b{display:block;margin-top:5px;font-size:18px}
+    .footer{color:#667085;font-size:12px;margin-top:14px}
+    .print-title{display:none}
+    @media(max-width:1000px){
+      .grid{grid-template-columns:1fr 1fr}
+      .layout{grid-template-columns:1fr}
+      .filters{grid-template-columns:1fr 1fr}
+      .summary{grid-template-columns:1fr 1fr}
+      .hide-mobile{display:none}
+    }
+    @media(max-width:620px){
+      .grid,.summary,.row,.row3,.filters{grid-template-columns:1fr}
+      header{padding:16px}
+      .wrap{padding:12px}
+    }
+    @media print{
+      header,.formcard,.filters,.btns,.footer,.no-print{display:none!important}
+      .wrap{max-width:none;padding:0}
+      .card{box-shadow:none;border:0}
+      .layout{display:block}
+      .tablebox{max-height:none;overflow:visible;border:0}
+      body{background:white}
+      .print-title{display:block;margin:0 0 12px;font-size:20px}
+      th{position:static}
+      table{font-size:11px}
+      th,td{padding:6px}
+    }
   </style>
 </head>
 <body>
 <header>
-  <div><h1>Sezai Usta Kasa Programı</h1><p>Günlük kasa, banka, tahsilat, ödeme ve müşteri iş takibi</p></div>
-  <div class="btns"><button class="light" onclick="print()">Yazdır / PDF</button><button class="light" onclick="exportCSV()">CSV Aktar</button><button class="red" onclick="resetAll()">Tümünü Sil</button></div>
+  <div>
+    <h1>Ekzen Teknik - İş Kaynağı Hesap Takip</h1>
+    <p>Beyaz eşya ve kombi işleri için kaynak bazlı hesaplaşma, malzeme düşümü ve PDF raporu</p>
+  </div>
+  <div class="btns">
+    <button class="light" onclick="printReport()">PDF / Yazdır</button>
+    <button class="light" onclick="exportCSV()">CSV Aktar</button>
+    <button class="red" onclick="resetAll()">Tümünü Sil</button>
+  </div>
 </header>
+
 <div class="wrap">
   <section class="grid">
-    <div class="card stat"><small>Toplam Nakit Kasa</small><b id="cashTotal">₺0</b></div>
-    <div class="card stat"><small>Toplam Banka / Kart</small><b id="bankTotal">₺0</b></div>
-    <div class="card stat"><small>Bu Ay Net</small><b id="monthNet">₺0</b></div>
-    <div class="card stat"><small>Bugünkü Net</small><b id="todayNet">₺0</b></div>
+    <div class="card stat"><small>Toplam Tahsilat</small><b id="totalCollection">₺0</b></div>
+    <div class="card stat"><small>Toplam Malzeme</small><b id="totalMaterial" class="danger">₺0</b></div>
+    <div class="card stat"><small>Dağıtılacak Net</small><b id="totalNet">₺0</b></div>
+    <div class="card stat"><small>Kaynaklara Ödenecek</small><b id="totalSourceShare" class="warn">₺0</b></div>
+    <div class="card stat"><small>Sana Kalan</small><b id="totalMyShare" class="ok">₺0</b></div>
   </section>
 
   <section class="layout">
     <div class="card formcard">
-      <h2 style="margin-top:0;font-size:18px">Yeni Kayıt</h2>
-      <input type="hidden" id="editId" />
+      <h2 style="margin-top:0;font-size:18px">Yeni İş Kaydı</h2>
+      <input type="hidden" id="editId">
 
       <div class="row">
         <div>
@@ -42,94 +109,120 @@
           <input type="date" id="date">
         </div>
         <div>
-          <label>İşlem Türü</label>
-          <select id="type">
-            <option value="income">Gelir / Tahsilat</option>
-            <option value="expense">Gider / Ödeme</option>
-            <option value="transfer">Virman / Aktarma</option>
-          </select>
+          <label>İş Kaynağı</label>
+          <input id="source" list="sourceList" placeholder="Örn: Ahmet Usta / Firma 1">
+          <datalist id="sourceList"></datalist>
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label>Hesap</label>
-          <select id="account">
-            <option>Nakit Kasa</option>
-            <option>Banka</option>
-            <option>Kredi Kartı / POS</option>
-            <option>IBAN Havale</option>
-          </select>
-        </div>
-        <div>
-          <label>Tutar</label>
-          <input type="number" id="amount" placeholder="Örn: 1500" min="0" step="0.01">
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Kategori</label>
-          <select id="category">
-            <option>Servis Ücreti</option>
-            <option>Parça Satışı</option>
-            <option>Bakım</option>
-            <option>Yol Ücreti</option>
-            <option>Parça Alımı</option>
-            <option>Yakıt</option>
-            <option>Yemek</option>
-            <option>Telefon / İnternet</option>
-            <option>Kira</option>
+          <label>İş Alanı</label>
+          <select id="serviceType">
+            <option>Beyaz Eşya</option>
+            <option>Kombi</option>
+            <option>Klima</option>
             <option>Diğer</option>
           </select>
         </div>
         <div>
-          <label>Ödeme Durumu</label>
+          <label>Cihaz</label>
+          <input id="device" placeholder="Örn: Çamaşır makinesi / Vaillant kombi">
+        </div>
+      </div>
+
+      <label>Müşteri Adı</label>
+      <input id="customer" placeholder="Müşteri adı">
+
+      <label>Telefon</label>
+      <input id="phone" placeholder="05xx xxx xx xx">
+
+      <label>Adres</label>
+      <textarea id="address" placeholder="Mahalle, sokak, bina, daire"></textarea>
+
+      <label>Yapılan İş / Arıza Açıklaması</label>
+      <textarea id="jobNote" placeholder="Örn: Kombi F1 arızası, elektrot temizliği, bakım yapıldı"></textarea>
+
+      <div class="row3">
+        <div>
+          <label>Tahsilat</label>
+          <input type="number" id="collection" min="0" step="0.01" placeholder="Örn: 2500">
+        </div>
+        <div>
+          <label>Malzeme</label>
+          <input type="number" id="material" min="0" step="0.01" placeholder="Örn: 800">
+        </div>
+        <div>
+          <label>Kaynak Payı %</label>
+          <input type="number" id="sourceRate" min="0" max="100" step="1" value="50">
+        </div>
+      </div>
+
+      <div class="summary">
+        <div class="box"><small>Net</small><b id="calcNet">₺0</b></div>
+        <div class="box"><small>Kaynak Payı</small><b id="calcSource" class="warn">₺0</b></div>
+        <div class="box"><small>Sana Kalan</small><b id="calcMine" class="ok">₺0</b></div>
+        <div class="box"><small>Malzeme</small><b id="calcMaterial" class="danger">₺0</b></div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Durum</label>
           <select id="status">
-            <option>Ödendi</option>
-            <option>Bekliyor</option>
-            <option>Kısmi</option>
+            <option>Hesaplaşılmadı</option>
+            <option>Hesaplaşıldı</option>
+            <option>Kaynağa Ödendi</option>
+            <option>İptal</option>
+          </select>
+        </div>
+        <div>
+          <label>Tahsilat Şekli</label>
+          <select id="paymentType">
+            <option>Nakit</option>
+            <option>IBAN</option>
+            <option>Kredi Kartı / POS</option>
+            <option>Alınmadı</option>
           </select>
         </div>
       </div>
 
-      <label>Müşteri / Tedarikçi</label>
-      <input id="person" placeholder="Örn: Ahmet Yılmaz / Parçacı" />
-
-      <label>Telefon</label>
-      <input id="phone" placeholder="05xx xxx xx xx" />
-
-      <label>Açıklama</label>
-      <textarea id="note" placeholder="Örn: Vaillant kombi F1 arızası, anakart kontrol edildi"></textarea>
-
       <div class="btns">
-        <button class="primary" onclick="saveTx()">Kaydet</button>
+        <button class="primary" onclick="saveJob()">Kaydet</button>
         <button class="light" onclick="clearForm()">Temizle</button>
       </div>
-
-      <p class="footer">Kayıtlar bu cihazın tarayıcısında saklanır. Başka bilgisayara geçerken CSV dışa aktar.</p>
+      <p class="footer">Formül: Tahsilat - Malzeme = Net. Net tutarın kaynak payı otomatik hesaplanır. Varsayılan oran %50.</p>
     </div>
 
     <div class="card">
-      <h2 style="margin-top:0;font-size:18px">Kasa Hareketleri</h2>
+      <h2 class="print-title" id="printTitle">İş Kaynağı Hesap Raporu</h2>
+      <h2 style="margin-top:0;font-size:18px">İş Kayıtları ve Hesaplaşma</h2>
 
       <div class="filters">
         <input type="date" id="fStart" onchange="render()">
         <input type="date" id="fEnd" onchange="render()">
-        <select id="fType" onchange="render()">
-          <option value="">Tüm türler</option>
-          <option value="income">Gelir</option>
-          <option value="expense">Gider</option>
-          <option value="transfer">Virman</option>
+        <input id="fSource" list="sourceList" oninput="render()" placeholder="İş kaynağı filtrele">
+        <select id="fStatus" onchange="render()">
+          <option value="">Tüm durumlar</option>
+          <option>Hesaplaşılmadı</option>
+          <option>Hesaplaşıldı</option>
+          <option>Kaynağa Ödendi</option>
+          <option>İptal</option>
         </select>
-        <select id="fAccount" onchange="render()">
-          <option value="">Tüm hesaplar</option>
-          <option>Nakit Kasa</option>
-          <option>Banka</option>
-          <option>Kredi Kartı / POS</option>
-          <option>IBAN Havale</option>
+        <select id="fService" onchange="render()">
+          <option value="">Tüm işler</option>
+          <option>Beyaz Eşya</option>
+          <option>Kombi</option>
+          <option>Klima</option>
+          <option>Diğer</option>
         </select>
-        <input id="fSearch" oninput="render()" placeholder="Ara: müşteri, not...">
+        <input id="fSearch" oninput="render()" placeholder="Ara: müşteri, adres, cihaz">
+      </div>
+
+      <div class="summary" id="filteredSummary">
+        <div class="box"><small>Listelenen Tahsilat</small><b id="sumCollection">₺0</b></div>
+        <div class="box"><small>Listelenen Malzeme</small><b id="sumMaterial" class="danger">₺0</b></div>
+        <div class="box"><small>Kaynak Alacağı</small><b id="sumSource" class="warn">₺0</b></div>
+        <div class="box"><small>Sana Kalan</small><b id="sumMine" class="ok">₺0</b></div>
       </div>
 
       <div class="tablebox">
@@ -137,64 +230,100 @@
           <thead>
             <tr>
               <th>Tarih</th>
-              <th>Tür</th>
-              <th>Hesap</th>
-              <th>Kategori</th>
-              <th>Kişi</th>
-              <th class="right">Tutar</th>
-              <th class="hide-mobile">Not</th>
-              <th>İşlem</th>
+              <th>Kaynak</th>
+              <th>Müşteri / Adres</th>
+              <th>İş</th>
+              <th class="right">Tahsilat</th>
+              <th class="right">Malzeme</th>
+              <th class="right">Kaynak Payı</th>
+              <th class="right">Sana Kalan</th>
+              <th>Durum</th>
+              <th class="no-print">İşlem</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-
       <p class="muted" id="countText"></p>
     </div>
   </section>
 </div>
 
 <script>
-const KEY='sezai_kasa_v1';
-const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
-const today = () => new Date().toISOString().slice(0,10);
-let txs = JSON.parse(localStorage.getItem(KEY)||'[]');
+const KEY='ekzen_kaynak_hesap_v1';
+let jobs=JSON.parse(localStorage.getItem(KEY)||'[]');
 
-document.getElementById('date').value=today();
+const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
+const today=()=>new Date().toISOString().slice(0,10);
+const el=id=>document.getElementById(id);
+const val=id=>el(id).value.trim();
+
+el('date').value=today();
+
+['collection','material','sourceRate'].forEach(id=>el(id).addEventListener('input',updateCalc));
+
+function calc(j){
+  const collection=Number(j.collection||0);
+  const material=Number(j.material||0);
+  const rate=Number(j.sourceRate||50);
+  const net=Math.max(collection-material,0);
+  const sourceShare=net*rate/100;
+  const myShare=net-sourceShare;
+  return {collection,material,rate,net,sourceShare,myShare};
+}
+
+function updateCalc(){
+  const c=calc({
+    collection:val('collection'),
+    material:val('material'),
+    sourceRate:val('sourceRate')
+  });
+  el('calcNet').textContent=fmt(c.net);
+  el('calcSource').textContent=fmt(c.sourceShare);
+  el('calcMine').textContent=fmt(c.myShare);
+  el('calcMaterial').textContent=fmt(c.material);
+}
 
 function persist(){
-  localStorage.setItem(KEY,JSON.stringify(txs));
+  localStorage.setItem(KEY,JSON.stringify(jobs));
+  refreshSources();
 }
 
-function val(id){
-  return document.getElementById(id).value.trim();
-}
+function saveJob(){
+  if(!val('date')||!val('source')){
+    alert('Tarih ve iş kaynağı zorunlu.');
+    return;
+  }
 
-function saveTx(){
-  const amount=parseFloat(val('amount'));
-  if(!val('date')||!amount||amount<=0){
-    alert('Tarih ve tutar zorunlu.');
+  const collection=parseFloat(val('collection')||0);
+  const material=parseFloat(val('material')||0);
+
+  if(collection<0||material<0){
+    alert('Tutarlar eksi olamaz.');
     return;
   }
 
   const item={
     id:val('editId')||crypto.randomUUID(),
     date:val('date'),
-    type:val('type'),
-    account:val('account'),
-    amount,
-    category:val('category'),
-    status:val('status'),
-    person:val('person'),
+    source:val('source'),
+    serviceType:val('serviceType'),
+    device:val('device'),
+    customer:val('customer'),
     phone:val('phone'),
-    note:val('note'),
+    address:val('address'),
+    jobNote:val('jobNote'),
+    collection,
+    material,
+    sourceRate:Number(val('sourceRate')||50),
+    status:val('status'),
+    paymentType:val('paymentType'),
     createdAt:new Date().toISOString()
   };
 
-  const i=txs.findIndex(x=>x.id===item.id);
-  if(i>-1) txs[i]=item;
-  else txs.unshift(item);
+  const i=jobs.findIndex(x=>x.id===item.id);
+  if(i>-1) jobs[i]=item;
+  else jobs.unshift(item);
 
   persist();
   clearForm();
@@ -202,129 +331,174 @@ function saveTx(){
 }
 
 function clearForm(){
-  ['editId','amount','person','phone','note'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('date').value=today();
-  document.getElementById('type').value='income';
-  document.getElementById('account').value='Nakit Kasa';
-  document.getElementById('category').value='Servis Ücreti';
-  document.getElementById('status').value='Ödendi';
-}
-
-function sign(x){
-  return x.type==='expense'?-x.amount:x.type==='income'?x.amount:0;
+  ['editId','source','device','customer','phone','address','jobNote','collection','material'].forEach(id=>el(id).value='');
+  el('date').value=today();
+  el('serviceType').value='Beyaz Eşya';
+  el('sourceRate').value=50;
+  el('status').value='Hesaplaşılmadı';
+  el('paymentType').value='Nakit';
+  updateCalc();
 }
 
 function filtered(){
-  const s=val('fStart'),
-        e=val('fEnd'),
-        t=val('fType'),
-        a=val('fAccount'),
-        q=val('fSearch').toLowerCase();
+  const s=val('fStart');
+  const e=val('fEnd');
+  const src=val('fSource').toLowerCase();
+  const st=val('fStatus');
+  const srv=val('fService');
+  const q=val('fSearch').toLowerCase();
 
-  return txs.filter(x=>
+  return jobs.filter(x=>
     (!s||x.date>=s)&&
     (!e||x.date<=e)&&
-    (!t||x.type===t)&&
-    (!a||x.account===a)&&
-    (!q||[x.person,x.phone,x.note,x.category,x.status].join(' ').toLowerCase().includes(q))
+    (!src||x.source.toLowerCase().includes(src))&&
+    (!st||x.status===st)&&
+    (!srv||x.serviceType===srv)&&
+    (!q||[x.customer,x.phone,x.address,x.device,x.jobNote,x.source].join(' ').toLowerCase().includes(q))
   ).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+}
+
+function statusClass(s){
+  return s==='Hesaplaşıldı'?'done':s==='Kaynağa Ödendi'?'paid':s==='İptal'?'cancel':'pending';
 }
 
 function render(){
   const rows=filtered();
-  const tbody=document.getElementById('tbody');
-  tbody.innerHTML='';
+  const tb=el('tbody');
+  tb.innerHTML='';
+
+  let sc=0,sm=0,ss=0,smy=0;
 
   rows.forEach(x=>{
-    const cls=x.type==='income'?'income':x.type==='expense'?'expense':'transfer';
-    const name=x.type==='income'?'Gelir':x.type==='expense'?'Gider':'Virman';
-    const tr=document.createElement('tr');
+    const c=calc(x);
+    sc+=c.collection;
+    sm+=c.material;
+    ss+=c.sourceShare;
+    smy+=c.myShare;
 
+    const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td>${x.date}</td>
-      <td><span class="pill ${cls}">${name}</span><br><span class="muted">${x.status}</span></td>
-      <td>${x.account}</td>
-      <td>${x.category}</td>
-      <td>${x.person||'-'}<br><span class="muted">${x.phone||''}</span></td>
-      <td class="right ${x.type==='expense'?'danger':x.type==='income'?'ok':''}">${fmt(x.amount)}</td>
-      <td class="hide-mobile">${x.note||''}</td>
-      <td>
-        <button class="light" onclick="editTx('${x.id}')">Düzenle</button>
-        <button class="red" onclick="delTx('${x.id}')">Sil</button>
+      <td>${x.date}<br><span class="muted">${x.paymentType||''}</span></td>
+      <td><b>${esc(x.source)}</b><br><span class="muted">%${c.rate}</span></td>
+      <td>${esc(x.customer)||'-'}<br><span class="muted">${esc(x.phone)||''}</span><br><span class="muted">${esc(x.address)||''}</span></td>
+      <td><b>${esc(x.serviceType)}</b><br>${esc(x.device)||''}<br><span class="muted">${esc(x.jobNote)||''}</span></td>
+      <td class="right ok">${fmt(c.collection)}</td>
+      <td class="right danger">${fmt(c.material)}</td>
+      <td class="right warn"><b>${fmt(c.sourceShare)}</b></td>
+      <td class="right ok"><b>${fmt(c.myShare)}</b></td>
+      <td><span class="pill ${statusClass(x.status)}">${x.status}</span></td>
+      <td class="no-print">
+        <button class="light" onclick="editJob('${x.id}')">Düzenle</button>
+        <button class="red" onclick="delJob('${x.id}')">Sil</button>
       </td>
     `;
-
-    tbody.appendChild(tr);
+    tb.appendChild(tr);
   });
 
-  document.getElementById('countText').textContent=`${rows.length} kayıt listeleniyor.`;
+  el('sumCollection').textContent=fmt(sc);
+  el('sumMaterial').textContent=fmt(sm);
+  el('sumSource').textContent=fmt(ss);
+  el('sumMine').textContent=fmt(smy);
+  el('countText').textContent=`${rows.length} iş kaydı listeleniyor.`;
+
   updateStats();
+  refreshSources();
+  updatePrintTitle();
 }
 
 function updateStats(){
-  const m=new Date().toISOString().slice(0,7);
-  const d=today();
+  let tc=0,tm=0,tn=0,ts=0,my=0;
 
-  let cash=0,bank=0,month=0,day=0;
-
-  txs.forEach(x=>{
-    const v=sign(x);
-
-    if(x.account==='Nakit Kasa') cash+=v;
-    else bank+=v;
-
-    if(x.date.slice(0,7)===m) month+=v;
-    if(x.date===d) day+=v;
+  jobs.filter(x=>x.status!=='İptal').forEach(x=>{
+    const c=calc(x);
+    tc+=c.collection;
+    tm+=c.material;
+    tn+=c.net;
+    ts+=c.sourceShare;
+    my+=c.myShare;
   });
 
-  document.getElementById('cashTotal').textContent=fmt(cash);
-  document.getElementById('bankTotal').textContent=fmt(bank);
-  document.getElementById('monthNet').textContent=fmt(month);
-  document.getElementById('todayNet').textContent=fmt(day);
+  el('totalCollection').textContent=fmt(tc);
+  el('totalMaterial').textContent=fmt(tm);
+  el('totalNet').textContent=fmt(tn);
+  el('totalSourceShare').textContent=fmt(ts);
+  el('totalMyShare').textContent=fmt(my);
 }
 
-function editTx(id){
-  const x=txs.find(x=>x.id===id);
-  if(!x)return;
+function editJob(id){
+  const x=jobs.find(j=>j.id===id);
+  if(!x) return;
 
-  ['editId','date','type','account','amount','category','status','person','phone','note']
-    .forEach(k=>document.getElementById(k).value=x[k]??'');
+  ['editId','date','source','serviceType','device','customer','phone','address','jobNote','collection','material','sourceRate','status','paymentType']
+    .forEach(k=>el(k).value=x[k]??'');
 
+  updateCalc();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function delTx(id){
-  if(confirm('Bu kaydı silmek istiyor musun?')){
-    txs=txs.filter(x=>x.id!==id);
+function delJob(id){
+  if(confirm('Bu iş kaydını silmek istiyor musun?')){
+    jobs=jobs.filter(x=>x.id!==id);
     persist();
     render();
   }
 }
 
 function resetAll(){
-  if(confirm('Tüm kasa kayıtları silinecek. Emin misin?')){
-    txs=[];
+  if(confirm('Tüm iş kayıtları silinecek. Emin misin?')){
+    jobs=[];
     persist();
     render();
   }
 }
 
+function refreshSources(){
+  const list=[...new Set(jobs.map(x=>x.source).filter(Boolean))].sort();
+  el('sourceList').innerHTML=list.map(s=>`<option value="${esc(s)}"></option>`).join('');
+}
+
+function updatePrintTitle(){
+  const src=val('fSource')||'Tüm İş Kaynakları';
+  const start=val('fStart')||'Başlangıç';
+  const end=val('fEnd')||'Bugün';
+  el('printTitle').textContent=`${src} - Hesap Raporu (${start} / ${end})`;
+}
+
+function printReport(){
+  updatePrintTitle();
+  window.print();
+}
+
 function exportCSV(){
   const rows=filtered();
-  const head=['Tarih','Tür','Hesap','Kategori','Durum','Müşteri/Tedarikçi','Telefon','Tutar','Not'];
+  const head=[
+    'Tarih','İş Kaynağı','İş Alanı','Cihaz','Müşteri','Telefon','Adres',
+    'Yapılan İş','Tahsilat','Malzeme','Net','Kaynak Payı %','Kaynak Payı',
+    'Sana Kalan','Durum','Tahsilat Şekli'
+  ];
 
-  const csv=[head,...rows.map(x=>[
-    x.date,x.type,x.account,x.category,x.status,x.person,x.phone,x.amount,x.note
-  ])].map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
+  const csv=[head,...rows.map(x=>{
+    const c=calc(x);
+    return [
+      x.date,x.source,x.serviceType,x.device,x.customer,x.phone,x.address,
+      x.jobNote,c.collection,c.material,c.net,c.rate,c.sourceShare,
+      c.myShare,x.status,x.paymentType
+    ];
+  })].map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
 
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='kasa-kayitlari.csv';
+  a.download='is-kaynagi-hesap-raporu.csv';
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
+function esc(s){
+  return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+}
+
+updateCalc();
 render();
 </script>
 </body>
