@@ -303,22 +303,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 <div>
 <label>İş Kaynağı</label>
-<select id="cashSource" onchange="updateCashSourceBalance()"></select>
-</div>
-</div>
-
-<div class="summary">
-<div class="box">
-<small>Seçili Kaynak Ödeme Yapılacak</small>
-<b id="cashSourceBalance" class="warn">₺0</b>
-</div>
-<div class="box">
-<small>Seçili Kaynak Hakediş</small>
-<b id="cashSourceShare" class="warn">₺0</b>
-</div>
-<div class="box">
-<small>Seçili Kaynak Kasa Eksi</small>
-<b id="cashSourceOut" class="danger">₺0</b>
+<select id="cashSource"></select>
 </div>
 </div>
 
@@ -379,7 +364,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <div class="summary">
-<div class="box"><small>Para Girişi</small><b id="cashPageIn" class="ok">₺0</b></div>
+<div class="box"><small>Hakediş Kalan</small><b id="cashPageRemaining" class="ok">₺0</b></div>
 <div class="box"><small>Kasa Eksi</small><b id="cashPageOut" class="danger">₺0</b></div>
 <div class="box"><small>Net Hareket</small><b id="cashPageNet">₺0</b></div>
 </div>
@@ -524,7 +509,7 @@ el('tabCashBtn').classList.toggle('active',tab==='cash');
 el('tabSettingsBtn').classList.toggle('active',tab==='settings');
 
 if(tab==='settings') renderSettings();
-if(tab==='cash'){renderCashPage();updateCashSourceBalance()}
+if(tab==='cash') renderCashPage();
 if(tab==='jobList') renderJobListPage();
 if(tab==='newJob') renderJobEntryCards();
 if(tab==='home') render();
@@ -599,7 +584,7 @@ settings.subtitle=val('setSubtitle')||defaultSettings.subtitle;
 settings.defaultRate=Number(val('setDefaultRate')||50);
 if(settings.defaultRate<0)settings.defaultRate=0;
 if(settings.defaultRate>100)settings.defaultRate=100;
-saveSettings();applySettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
+saveSettings();applySettings();render();renderCashPage();renderJobListPage();
 alert('Genel ayarlar kaydedildi.');
 }
 
@@ -609,7 +594,7 @@ if(!value){alert('Boş kayıt eklenemez.');return}
 if(settings[type].includes(value)){alert('Bu kayıt zaten var.');return}
 settings[type].push(value);
 el(inputId).value='';
-saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function editSettingItem(type,index){
@@ -631,7 +616,7 @@ jobs.forEach(j=>{if(j.paymentType===oldValue)j.paymentType=clean});
 cashMoves.forEach(c=>{if(c.paymentType===oldValue)c.paymentType=clean});
 }
 
-saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
+saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function deleteSettingItem(type,index){
@@ -639,7 +624,7 @@ const value=settings[type][index];
 if(settings[type].length<=1){alert('En az 1 kayıt kalmalı.');return}
 if(!confirm(value+' silinsin mi? Eski kayıtlardan silinmez; sadece seçim listesinden kalkar.'))return;
 settings[type].splice(index,1);
-saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function renderSettings(){
@@ -664,7 +649,7 @@ el(listId).innerHTML=settings[type].map((item,index)=>`
 function resetSettings(){
 if(!confirm('Ayarlar varsayılana dönecek. İş ve kasa kayıtların silinmez. Emin misin?'))return;
 settings={...defaultSettings};
-saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();updateCashSourceBalance();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function calc(j){
@@ -697,12 +682,19 @@ return {
 };
 }
 
-function updateCashSourceBalance(){
-const src=val('cashSource');
-const b=sourceBalance(src);
-el('cashSourceBalance').textContent=fmt(b.balance);
-el('cashSourceShare').textContent=fmt(b.hak);
-el('cashSourceOut').textContent=fmt(b.cashOut);
+function sourceRemainingHakedis(source){
+let totalHakedis=0;
+let paidHakedis=0;
+
+jobs.filter(x=>x.status!=='İptal' && (!source || x.source===source)).forEach(x=>{
+  totalHakedis+=calc(x).sourceShare;
+});
+
+cashMoves.filter(x=>(!source || x.source===source) && x.type==='hakedis').forEach(x=>{
+  paidHakedis+=Number(x.amount||0);
+});
+
+return Math.max(totalHakedis-paidHakedis,0);
 }
 
 function saveJob(){
@@ -734,7 +726,6 @@ clearForm();
 render();
 renderJobListPage();
 renderJobEntryCards();
-updateCashSourceBalance();
 showTab('jobList');
 }
 
@@ -948,7 +939,7 @@ saveJobs();
 render();
 renderJobListPage();
 renderJobEntryCards();
-updateCashSourceBalance();
+renderCashPage();
 }
 }
 
@@ -975,7 +966,6 @@ saveCash();
 clearCashForm();
 renderCashPage();
 render();
-updateCashSourceBalance();
 showTab('home');
 }
 
@@ -985,7 +975,6 @@ el('cashDate').value=today();
 el('cashSource').value=settings.sources[0]||'';
 el('cashType').value='in';
 el('cashPaymentType').value=settings.paymentTypes[0]||'';
-updateCashSourceBalance();
 }
 
 function filteredCashPage(){
@@ -1028,12 +1017,14 @@ card.innerHTML=`
 mobile.appendChild(card);
 });
 
+const selectedSource=val('cfSource');
+const remainingHakedis=sourceRemainingHakedis(selectedSource);
 const net=cashIn-cashOut;
-el('cashPageIn').textContent=fmt(cashIn);
+
+el('cashPageRemaining').textContent=fmt(remainingHakedis);
 el('cashPageOut').textContent=fmt(cashOut);
 el('cashPageNet').textContent=fmt(net);
 el('cashPageNet').className=net>=0?'ok':'danger';
-updateCashSourceBalance();
 }
 
 function editCashMove(id){
@@ -1047,7 +1038,6 @@ el('cashAmount').value=x.amount;
 el('cashPaymentType').value=x.paymentType;
 el('cashCategory').value=x.category||'';
 el('cashNote').value=x.note||'';
-updateCashSourceBalance();
 showTab('cash');
 }
 
@@ -1057,7 +1047,6 @@ cashMoves=cashMoves.filter(x=>x.id!==id);
 saveCash();
 renderCashPage();
 render();
-updateCashSourceBalance();
 }
 }
 
@@ -1070,7 +1059,6 @@ saveCash();
 render();
 renderCashPage();
 renderJobListPage();
-updateCashSourceBalance();
 }
 }
 
