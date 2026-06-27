@@ -44,7 +44,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 .done{background:#dcfae6;color:#067647}.pending{background:#fff4cc;color:#8a6100}.paid{background:#e0eaff;color:#1849a9}.cancel{background:#fee4e2;color:#b42318}
 .cashin{background:#dcfae6;color:#067647}.cashout{background:#fee4e2;color:#b42318}
 .muted{color:var(--muted);font-size:12px}
-.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:10px 0}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
 .summary .box{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px;min-width:0}
 .summary .box small{color:var(--muted);font-size:12px}
 .summary .box b{display:block;margin-top:5px;font-size:18px;overflow-wrap:anywhere}
@@ -59,7 +59,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 .job-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
 .job-card h3{margin:0;font-size:16px;overflow-wrap:anywhere}
 .job-card p{margin:6px 0;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
-.money-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.money-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
 .money-grid div{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:8px}
 .money-grid small{color:var(--muted);display:block;font-size:11px}
 .money-grid b{font-size:14px;overflow-wrap:anywhere}
@@ -96,7 +96,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div id="homePage">
 <section class="grid">
 <div class="card stat"><small>Toplam Tahsilat</small><b id="totalCollection">₺0</b></div>
-<div class="card stat"><small>Toplam Malzeme</small><b id="totalMaterial" class="danger">₺0</b></div>
+<div class="card stat"><small>Toplam Masraf</small><b id="totalMaterial" class="danger">₺0</b></div>
 <div class="card stat"><small>Hakediş</small><b id="totalSourceShare" class="warn">₺0</b></div>
 <div class="card stat"><small>Ekstra Gider</small><b id="totalCashNet">₺0</b></div>
 <div class="card stat"><small>Ödeme Yapılacak</small><b id="totalBalance" class="warn">₺0</b></div>
@@ -117,10 +117,8 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 
 <div class="summary">
 <div class="box"><small>Hakediş</small><b id="sumSource" class="warn">₺0</b></div>
-<div class="box"><small>Para Girişi</small><b id="sumCashIn" class="ok">₺0</b></div>
 <div class="box"><small>Ekstra Gider</small><b id="sumCashOut" class="danger">₺0</b></div>
 <div class="box"><small>Ödeme Yapılacak</small><b id="sumBalance" class="warn">₺0</b></div>
-<div class="box"><small>Sana Kalan</small><b id="sumMine" class="ok">₺0</b></div>
 </div>
 
 <div class="btns no-print">
@@ -136,7 +134,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <thead>
 <tr>
 <th>Tarih</th><th>Kaynak</th><th>Müşteri / Adres</th><th>İş</th>
-<th class="right">Tahsilat</th><th class="right">Malzeme</th><th class="right">Hakediş</th><th class="right">Sana Kalan</th><th>Durum</th><th class="no-print">İşlem</th>
+<th class="right">Tahsilat</th><th class="right">Masraf</th><th class="right">Hakediş</th><th>Durum</th><th class="no-print">İşlem</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -204,7 +202,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <input type="number" id="collection" min="0" step="0.01" placeholder="Örn: 2500">
 </div>
 <div>
-<label>Malzeme</label>
+<label>Masraf</label>
 <input type="number" id="material" min="0" step="0.01" placeholder="Örn: 800">
 </div>
 <div>
@@ -230,7 +228,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <button class="light" onclick="showTab('home')">Ana Sayfaya Dön</button>
 </div>
 
-<p class="footer">Formül: Tahsilat - Malzeme = Net. Net tutarın kaynak payı hakediş olarak hesaplanır.</p>
+<p class="footer">Formül: Tahsilat - Masraf = Net. Net tutarın kaynak payı hakediş olarak hesaplanır.</p>
 </div>
 
 <div class="card">
@@ -312,8 +310,6 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="box"><small>Para Girişi</small><b id="cashPageIn" class="ok">₺0</b></div>
 <div class="box"><small>Ekstra Gider</small><b id="cashPageOut" class="danger">₺0</b></div>
 <div class="box"><small>Net Hareket</small><b id="cashPageNet">₺0</b></div>
-<div class="box"><small>Kayıt Sayısı</small><b id="cashPageCount">0</b></div>
-<div class="box"><small>Seçili Kaynak</small><b id="cashPageSource">Tümü</b></div>
 </div>
 
 <div class="tablebox">
@@ -398,9 +394,9 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <script>
-const JOB_KEY='ekzen_kaynak_hesap_v5_jobs';
-const CASH_KEY='ekzen_kaynak_hesap_v5_cash';
-const SET_KEY='ekzen_kaynak_hesap_v5_settings';
+const JOB_KEY='ekzen_kaynak_hesap_v6_jobs';
+const CASH_KEY='ekzen_kaynak_hesap_v6_cash';
+const SET_KEY='ekzen_kaynak_hesap_v6_settings';
 
 const defaultSettings={
 title:'Ekzen Teknik - Hakediş Takip',
@@ -412,7 +408,7 @@ statuses:['Hesaplaşılmadı','Hesaplaşıldı','Ödendi','İptal'],
 paymentTypes:['Nakit','IBAN','Kredi Kartı / POS','Alınmadı']
 };
 
-let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
+let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v5_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
 let jobs=JSON.parse(localStorage.getItem(JOB_KEY)||'[]');
 
 if(jobs.length===0 && oldJobs.length>0){
@@ -420,7 +416,7 @@ jobs=oldJobs.map(j=>({...j,customerInfo:j.customerInfo||[j.customer,j.phone,j.ad
 localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
 }
 
-let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
+let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v5_cash')||localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
 let cashMoves=JSON.parse(localStorage.getItem(CASH_KEY)||'[]');
 
 if(cashMoves.length===0 && oldCash.length>0){
@@ -430,7 +426,7 @@ localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
 
 let settings={
 ...defaultSettings,
-...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
+...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v5_settings')||localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
 };
 
 const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
@@ -664,7 +660,6 @@ tr.innerHTML=`
 <td class="right ok">${fmt(c.collection)}</td>
 <td class="right danger">${fmt(c.material)}</td>
 <td class="right warn"><b>${fmt(c.sourceShare)}</b></td>
-<td class="right ok"><b>${fmt(c.myShare)}</b></td>
 <td><span class="pill ${statusClass(x.status)}">${esc(x.status)}</span></td>
 <td class="no-print"><button class="light" onclick="editJob('${x.id}')">Düzenle</button><button class="red" onclick="delJob('${x.id}')">Sil</button></td>`;
 tb.appendChild(tr);
@@ -701,10 +696,8 @@ cashReportMobile.appendChild(card);
 
 const balance=sourceShareTotal+cashIn-cashOut;
 el('sumSource').textContent=fmt(sourceShareTotal);
-el('sumCashIn').textContent=fmt(cashIn);
 el('sumCashOut').textContent=fmt(cashOut);
 el('sumBalance').textContent=fmt(balance);
-el('sumMine').textContent=fmt(myTotal);
 el('countText').textContent=`${rows.length} iş kaydı, ${cashRows.length} kasa hareketi listeleniyor.`;
 
 updateStats();
@@ -725,9 +718,8 @@ card.innerHTML=`
 <p><b>Açıklama:</b> ${esc(x.jobNote)||'-'}</p>
 <div class="money-grid">
 <div><small>Tahsilat</small><b class="ok">${fmt(c.collection)}</b></div>
-<div><small>Malzeme</small><b class="danger">${fmt(c.material)}</b></div>
+<div><small>Masraf</small><b class="danger">${fmt(c.material)}</b></div>
 <div><small>Hakediş</small><b class="warn">${fmt(c.sourceShare)}</b></div>
-<div><small>Sana Kalan</small><b class="ok">${fmt(c.myShare)}</b></div>
 </div>
 <div class="btns no-print">
 <button class="light" onclick="editJob('${x.id}')">Düzenle</button>
@@ -862,8 +854,6 @@ el('cashPageIn').textContent=fmt(cashIn);
 el('cashPageOut').textContent=fmt(cashOut);
 el('cashPageNet').textContent=fmt(net);
 el('cashPageNet').className=net>=0?'ok':'danger';
-el('cashPageCount').textContent=rows.length;
-el('cashPageSource').textContent=val('cfSource')||'Tümü';
 }
 
 function editCashMove(id){
@@ -911,15 +901,15 @@ function exportCSV(){
 const jobRows=filteredJobs();
 const cashRows=filteredCashForReport();
 const rows=[];
-rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Malzeme','Net','Hakediş','Sana Kalan','Para Girişi','Ekstra Gider','Durum','Ödeme Şekli']);
+rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Masraf','Net','Hakediş','Para Girişi','Ekstra Gider','Durum','Ödeme Şekli']);
 
 jobRows.forEach(x=>{
 const c=calc(x);
-rows.push(['İş Kaydı',x.date,x.source,x.serviceType,`${x.customerInfo||''} ${x.device||''} ${x.jobNote||''}`,c.collection,c.material,c.net,c.sourceShare,c.myShare,'','',x.status,x.paymentType]);
+rows.push(['İş Kaydı',x.date,x.source,x.serviceType,`${x.customerInfo||''} ${x.device||''} ${x.jobNote||''}`,c.collection,c.material,c.net,c.sourceShare,'','',x.status,x.paymentType]);
 });
 
 cashRows.forEach(x=>{
-rows.push(['Kasa Hareketi',x.date,x.source,x.type==='in'?'Para Girişi':'Ekstra Gider',`${x.category||''} ${x.note||''}`,'','','','','',x.type==='in'?x.amount:'',x.type==='out'?x.amount:'', '',x.paymentType]);
+rows.push(['Kasa Hareketi',x.date,x.source,x.type==='in'?'Para Girişi':'Ekstra Gider',`${x.category||''} ${x.note||''}`,'','','','',x.type==='in'?x.amount:'',x.type==='out'?x.amount:'', '',x.paymentType]);
 });
 
 const csv=rows.map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
