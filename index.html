@@ -33,8 +33,8 @@ button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:poin
 .light{background:#eef2f7;color:#182230}
 .red{background:#fee4e2;color:#b42318}
 .orange{background:#ffead5;color:#9a3412}
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.home-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.btns,.home-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.home-actions{margin:14px 0}
 .home-actions button{min-width:150px}
 .source-panel{max-width:420px;margin-bottom:14px}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -70,9 +70,10 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 .divider{height:1px;background:var(--border);margin:14px 0}
 @media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr 1fr}.settings-grid{grid-template-columns:1fr}}
 @media(max-width:720px){header{padding:14px}header h1{font-size:18px}.wrap{padding:10px}.grid,.summary,.row,.row3,.filters{grid-template-columns:1fr}.stat b{font-size:19px}.card{padding:12px;border-radius:12px}.tablebox{display:none}.mobile-cards{display:block}.btns button,.home-actions button{flex:1 1 auto}.money-grid{grid-template-columns:1fr 1fr}.setting-item{grid-template-columns:1fr}}
-@media print{header,.tabs,.filters,.btns,.settings-page,.footer,.no-print,.mobile-cards,#jobEntryPage,#cashPage,.home-actions,.source-panel{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.tablebox{display:block;max-height:none;overflow:visible;border:0}body{background:white}.print-title{display:block;margin:0 0 12px;font-size:20px}th{position:static}table{font-size:11px}th,td{padding:6px}}
+@media print{header,.tabs,.filters,.btns,.settings-page,.footer,.no-print,.mobile-cards,#newJobPage,#cashPage,#jobListPage,.home-actions,.source-panel{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.tablebox{display:block;max-height:none;overflow:visible;border:0}body{background:white}.print-title{display:block;margin:0 0 12px;font-size:20px}th{position:static}table{font-size:11px}th,td{padding:6px}}
 </style>
 </head>
+
 <body>
 <header>
 <div class="header-inner">
@@ -91,7 +92,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="wrap">
 <div class="tabs">
 <button class="tab-btn active" id="tabHomeBtn" onclick="showTab('home')">Ana Sayfa</button>
-<button class="tab-btn" id="tabJobsBtn" onclick="showTab('jobEntry')">İş Kayıtları</button>
+<button class="tab-btn" id="tabJobsBtn" onclick="showTab('jobList')">İş Kayıtları</button>
 <button class="tab-btn" id="tabCashBtn" onclick="showTab('cash')">Kasa Giriş / Çıkış</button>
 <button class="tab-btn" id="tabSettingsBtn" onclick="showTab('settings')">Ayarlar</button>
 </div>
@@ -108,7 +109,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="home-actions no-print">
 <button class="primary" onclick="toggleSourcePanel()">İş Kaynakları</button>
 <button class="light" onclick="showDetails()">Detay</button>
-<button class="light" onclick="showTab('jobEntry')">Yeni İş Kaydı</button>
+<button class="light" onclick="openNewJob()">Yeni İş Kaydı</button>
 <button class="light" onclick="showTab('cash')">Kasa Hareketi</button>
 </div>
 
@@ -173,10 +174,49 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 </div>
 
-<div id="jobEntryPage" class="hidden">
+<div id="jobListPage" class="hidden">
+<div class="card">
+<h2>İş Kayıtları</h2>
+
+<div class="home-actions no-print">
+<button class="primary" onclick="toggleJobSourcePanel()">İş Kaynakları</button>
+<button class="light" onclick="openNewJob()">Yeni İş Kaydı Aç</button>
+<button class="light" onclick="showTab('home')">Ana Sayfa</button>
+</div>
+
+<div id="jobSourcePanel" class="card source-panel hidden">
+<h2>Kaynak Seç</h2>
+<select id="jobSourceSelect" onchange="renderJobListPage()"></select>
+<p class="footer">Seçtiğin kaynağın iş kayıtları aşağıda listelenir.</p>
+</div>
+
+<div class="summary">
+<div class="box"><small>Listelenen Tahsilat</small><b id="jobListCollection" class="ok">₺0</b></div>
+<div class="box"><small>Listelenen Masraf</small><b id="jobListMaterial" class="danger">₺0</b></div>
+<div class="box"><small>Listelenen Hakediş</small><b id="jobListShare" class="warn">₺0</b></div>
+</div>
+
+<div class="tablebox">
+<table>
+<thead>
+<tr>
+<th>Tarih</th><th>Kaynak</th><th>Müşteri / Adres</th><th>İş</th>
+<th class="right">Tahsilat</th><th class="right">Masraf</th><th class="right">Hakediş</th><th>Durum</th><th class="no-print">İşlem</th>
+</tr>
+</thead>
+<tbody id="jobListTbody"></tbody>
+</table>
+</div>
+
+<div class="mobile-cards" id="jobListCards"></div>
+<p class="muted" id="jobListCount"></p>
+</div>
+</div>
+
+<div id="newJobPage" class="hidden">
 <section class="layout">
 <div class="card">
-<h2>Yeni İş Kaydı</h2>
+<h2 id="jobFormTitle">Yeni İş Kaydı</h2>
 <input type="hidden" id="editId">
 
 <div class="row">
@@ -236,7 +276,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="btns">
 <button class="primary" onclick="saveJob()">Kaydet</button>
 <button class="light" onclick="clearForm()">Temizle</button>
-<button class="light" onclick="showTab('home')">Ana Sayfaya Dön</button>
+<button class="light" onclick="showTab('jobList')">İş Kayıtlarına Dön</button>
 </div>
 
 <p class="footer">Formül: Tahsilat - Masraf = Net. Net tutarın kaynak payı hakediş olarak hesaplanır.</p>
@@ -408,7 +448,6 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 const JOB_KEY='ekzen_kaynak_hesap_v8_jobs';
 const CASH_KEY='ekzen_kaynak_hesap_v8_cash';
 const SET_KEY='ekzen_kaynak_hesap_v8_settings';
-const MIGRATION_KEY='ekzen_kaynak_hesap_v8_migrated';
 
 const defaultSettings={
 title:'Ekzen Teknik - Hakediş Takip',
@@ -420,57 +459,9 @@ statuses:['Hesaplaşılmadı','Hesaplaşıldı','Ödendi','İptal'],
 paymentTypes:['Nakit','IBAN','Kredi Kartı / POS','Alınmadı']
 };
 
-const migratedBefore=localStorage.getItem(MIGRATION_KEY)==='yes';
-
 let jobs=JSON.parse(localStorage.getItem(JOB_KEY)||'[]');
 let cashMoves=JSON.parse(localStorage.getItem(CASH_KEY)||'[]');
-
-if(!migratedBefore){
-  const oldJobs=JSON.parse(
-    localStorage.getItem('ekzen_kaynak_hesap_v7_jobs')||
-    localStorage.getItem('ekzen_kaynak_hesap_v6_jobs')||
-    localStorage.getItem('ekzen_kaynak_hesap_v5_jobs')||
-    localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||
-    localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||
-    localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||
-    '[]'
-  );
-
-  const oldCash=JSON.parse(
-    localStorage.getItem('ekzen_kaynak_hesap_v7_cash')||
-    localStorage.getItem('ekzen_kaynak_hesap_v6_cash')||
-    localStorage.getItem('ekzen_kaynak_hesap_v5_cash')||
-    localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||
-    localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||
-    '[]'
-  );
-
-  if(jobs.length===0 && oldJobs.length>0){
-    jobs=oldJobs.map(j=>({...j,customerInfo:j.customerInfo||[j.customer,j.phone,j.address].filter(Boolean).join(' - ')}));
-    localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
-  }
-
-  if(cashMoves.length===0 && oldCash.length>0){
-    cashMoves=oldCash;
-    localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
-  }
-
-  localStorage.setItem(MIGRATION_KEY,'yes');
-}
-
-let settings={
-...defaultSettings,
-...JSON.parse(
-  localStorage.getItem(SET_KEY)||
-  localStorage.getItem('ekzen_kaynak_hesap_v7_settings')||
-  localStorage.getItem('ekzen_kaynak_hesap_v6_settings')||
-  localStorage.getItem('ekzen_kaynak_hesap_v5_settings')||
-  localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||
-  localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||
-  localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||
-  '{}'
-)
-};
+let settings={...defaultSettings,...JSON.parse(localStorage.getItem(SET_KEY)||'{}')};
 
 const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
 const today=()=>new Date().toISOString().slice(0,10);
@@ -486,23 +477,32 @@ function saveSettings(){localStorage.setItem(SET_KEY,JSON.stringify(settings))}
 
 function showTab(tab){
 el('homePage').classList.toggle('hidden',tab!=='home');
-el('jobEntryPage').classList.toggle('hidden',tab!=='jobEntry');
+el('jobListPage').classList.toggle('hidden',tab!=='jobList');
+el('newJobPage').classList.toggle('hidden',tab!=='newJob');
 el('cashPage').classList.toggle('hidden',tab!=='cash');
 el('settingsPage').classList.toggle('hidden',tab!=='settings');
 
 el('tabHomeBtn').classList.toggle('active',tab==='home');
-el('tabJobsBtn').classList.toggle('active',tab==='jobEntry');
+el('tabJobsBtn').classList.toggle('active',tab==='jobList'||tab==='newJob');
 el('tabCashBtn').classList.toggle('active',tab==='cash');
 el('tabSettingsBtn').classList.toggle('active',tab==='settings');
 
 if(tab==='settings') renderSettings();
 if(tab==='cash') renderCashPage();
-if(tab==='jobEntry') renderJobEntryCards();
+if(tab==='jobList') renderJobListPage();
+if(tab==='newJob') renderJobEntryCards();
 if(tab==='home') render();
 window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function openNewJob(){
+clearForm();
+el('jobFormTitle').textContent='Yeni İş Kaydı';
+showTab('newJob');
+}
+
 function toggleSourcePanel(){el('sourcePanel').classList.toggle('hidden')}
+function toggleJobSourcePanel(){el('jobSourcePanel').classList.toggle('hidden')}
 
 function showDetails(){
 el('detailPanel').classList.remove('hidden');
@@ -515,7 +515,9 @@ el('fSource').value=el('homeSourceSelect').value;
 render();
 }
 
-function syncHomeSourceFromFilter(){el('homeSourceSelect').value=el('fSource').value}
+function syncHomeSourceFromFilter(){
+el('homeSourceSelect').value=el('fSource').value;
+}
 
 function applySettings(){
 el('appTitle').textContent=settings.title;
@@ -530,6 +532,7 @@ fillSelect('cashPaymentType',settings.paymentTypes);
 
 fillSelect('fSource',['',...settings.sources],'Tüm kaynaklar');
 fillSelect('homeSourceSelect',['',...settings.sources],'Tüm kaynaklar');
+fillSelect('jobSourceSelect',['',...settings.sources],'Tüm kaynaklar');
 fillSelect('fStatus',['',...settings.statuses],'Tüm durumlar');
 fillSelect('fService',['',...settings.serviceTypes],'Tüm işler');
 
@@ -560,7 +563,7 @@ settings.subtitle=val('setSubtitle')||defaultSettings.subtitle;
 settings.defaultRate=Number(val('setDefaultRate')||50);
 if(settings.defaultRate<0)settings.defaultRate=0;
 if(settings.defaultRate>100)settings.defaultRate=100;
-saveSettings();applySettings();render();renderCashPage();
+saveSettings();applySettings();render();renderCashPage();renderJobListPage();
 alert('Genel ayarlar kaydedildi.');
 }
 
@@ -570,7 +573,7 @@ if(!value){alert('Boş kayıt eklenemez.');return}
 if(settings[type].includes(value)){alert('Bu kayıt zaten var.');return}
 settings[type].push(value);
 el(inputId).value='';
-saveSettings();applySettings();renderSettings();render();renderCashPage();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function editSettingItem(type,index){
@@ -592,7 +595,7 @@ jobs.forEach(j=>{if(j.paymentType===oldValue)j.paymentType=clean});
 cashMoves.forEach(c=>{if(c.paymentType===oldValue)c.paymentType=clean});
 }
 
-saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();
+saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function deleteSettingItem(type,index){
@@ -600,7 +603,7 @@ const value=settings[type][index];
 if(settings[type].length<=1){alert('En az 1 kayıt kalmalı.');return}
 if(!confirm(value+' silinsin mi? Eski kayıtlardan silinmez; sadece seçim listesinden kalkar.'))return;
 settings[type].splice(index,1);
-saveSettings();applySettings();renderSettings();render();renderCashPage();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function renderSettings(){
@@ -625,7 +628,7 @@ el(listId).innerHTML=settings[type].map((item,index)=>`
 function resetSettings(){
 if(!confirm('Ayarlar varsayılana dönecek. İş ve kasa kayıtların silinmez. Emin misin?'))return;
 settings={...defaultSettings};
-saveSettings();applySettings();renderSettings();render();renderCashPage();
+saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
 
 function calc(j){
@@ -662,7 +665,12 @@ createdAt:new Date().toISOString()
 
 const i=jobs.findIndex(x=>x.id===item.id);
 if(i>-1)jobs[i]=item;else jobs.unshift(item);
-saveJobs();clearForm();render();renderJobEntryCards();showTab('home');
+saveJobs();
+clearForm();
+render();
+renderJobListPage();
+renderJobEntryCards();
+showTab('jobList');
 }
 
 function clearForm(){
@@ -673,6 +681,7 @@ el('serviceType').value=settings.serviceTypes[0]||'';
 el('sourceRate').value=settings.defaultRate||50;
 el('status').value=settings.statuses[0]||'';
 el('paymentType').value=settings.paymentTypes[0]||'';
+el('jobFormTitle').textContent='Yeni İş Kaydı';
 }
 
 function filteredJobs(){
@@ -681,6 +690,11 @@ return jobs.filter(x=>
 (!s||x.date>=s)&&(!e||x.date<=e)&&(!src||x.source===src)&&(!st||x.status===st)&&(!srv||x.serviceType===srv)&&
 (!q||[x.customerInfo,x.device,x.jobNote,x.source,x.serviceType].join(' ').toLowerCase().includes(q))
 ).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+}
+
+function filteredJobList(){
+const src=val('jobSourceSelect');
+return jobs.filter(x=>(!src||x.source===src)).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
 }
 
 function filteredCashForReport(){
@@ -709,20 +723,7 @@ let sourceShareTotal=0,cashIn=0,cashOut=0;
 rows.forEach(x=>{
 const c=calc(x);
 sourceShareTotal+=c.sourceShare;
-
-const tr=document.createElement('tr');
-tr.innerHTML=`
-<td>${esc(x.date)}<br><span class="muted">${esc(x.paymentType||'')}</span></td>
-<td><b>${esc(x.source)}</b><br><span class="muted">%${c.rate}</span></td>
-<td>${esc(x.customerInfo)||'-'}</td>
-<td><b>${esc(x.serviceType)}</b><br>${esc(x.device)||''}<br><span class="muted">${esc(x.jobNote)||''}</span></td>
-<td class="right ok">${fmt(c.collection)}</td>
-<td class="right danger">${fmt(c.material)}</td>
-<td class="right warn"><b>${fmt(c.sourceShare)}</b></td>
-<td><span class="pill ${statusClass(x.status)}">${esc(x.status)}</span></td>
-<td class="no-print"><button class="light" onclick="editJob('${x.id}')">Düzenle</button><button class="red" onclick="delJob('${x.id}')">Sil</button></td>`;
-tb.appendChild(tr);
-
+tb.appendChild(jobTableRow(x,c));
 mobile.appendChild(jobCard(x,c));
 });
 
@@ -761,7 +762,21 @@ el('countText').textContent=`${rows.length} iş kaydı, ${cashRows.length} kasa 
 
 updateStats();
 updatePrintTitle();
-renderJobEntryCards();
+}
+
+function jobTableRow(x,c){
+const tr=document.createElement('tr');
+tr.innerHTML=`
+<td>${esc(x.date)}<br><span class="muted">${esc(x.paymentType||'')}</span></td>
+<td><b>${esc(x.source)}</b><br><span class="muted">%${c.rate}</span></td>
+<td>${esc(x.customerInfo)||'-'}</td>
+<td><b>${esc(x.serviceType)}</b><br>${esc(x.device)||''}<br><span class="muted">${esc(x.jobNote)||''}</span></td>
+<td class="right ok">${fmt(c.collection)}</td>
+<td class="right danger">${fmt(c.material)}</td>
+<td class="right warn"><b>${fmt(c.sourceShare)}</b></td>
+<td><span class="pill ${statusClass(x.status)}">${esc(x.status)}</span></td>
+<td class="no-print"><button class="light" onclick="editJob('${x.id}')">Düzenle</button><button class="red" onclick="delJob('${x.id}')">Sil</button></td>`;
+return tr;
 }
 
 function jobCard(x,c){
@@ -785,6 +800,30 @@ card.innerHTML=`
 <button class="red" onclick="delJob('${x.id}')">Sil</button>
 </div>`;
 return card;
+}
+
+function renderJobListPage(){
+const rows=filteredJobList();
+const tb=el('jobListTbody');
+const cards=el('jobListCards');
+tb.innerHTML='';
+cards.innerHTML='';
+
+let totalCollection=0,totalMaterial=0,totalShare=0;
+
+rows.forEach(x=>{
+const c=calc(x);
+totalCollection+=c.collection;
+totalMaterial+=c.material;
+totalShare+=c.sourceShare;
+tb.appendChild(jobTableRow(x,c));
+cards.appendChild(jobCard(x,c));
+});
+
+el('jobListCollection').textContent=fmt(totalCollection);
+el('jobListMaterial').textContent=fmt(totalMaterial);
+el('jobListShare').textContent=fmt(totalShare);
+el('jobListCount').textContent=`${rows.length} iş kaydı listeleniyor.`;
 }
 
 function renderJobEntryCards(){
@@ -833,7 +872,8 @@ el('material').value=x.material||'';
 el('sourceRate').value=x.sourceRate||settings.defaultRate||50;
 el('status').value=x.status;
 el('paymentType').value=x.paymentType;
-showTab('jobEntry');
+el('jobFormTitle').textContent='İş Kaydını Düzenle';
+showTab('newJob');
 }
 
 function delJob(id){
@@ -841,6 +881,8 @@ if(confirm('Bu iş kaydını silmek istiyor musun?')){
 jobs=jobs.filter(x=>x.id!==id);
 saveJobs();
 render();
+renderJobListPage();
+renderJobEntryCards();
 }
 }
 
@@ -955,6 +997,7 @@ saveJobs();
 saveCash();
 render();
 renderCashPage();
+renderJobListPage();
 }
 }
 
@@ -1005,6 +1048,7 @@ clearForm();
 clearCashForm();
 render();
 renderCashPage();
+renderJobListPage();
 showTab('home');
 </script>
 </body>
