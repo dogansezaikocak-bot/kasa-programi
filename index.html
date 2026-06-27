@@ -34,6 +34,9 @@ button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:poin
 .red{background:#fee4e2;color:#b42318}
 .orange{background:#ffead5;color:#9a3412}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.home-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.home-actions button{min-width:150px}
+.source-panel{max-width:420px;margin-bottom:14px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;overflow-wrap:anywhere}
 th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index:1}
@@ -66,8 +69,8 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 .hidden{display:none!important}
 .divider{height:1px;background:var(--border);margin:14px 0}
 @media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr 1fr}.settings-grid{grid-template-columns:1fr}}
-@media(max-width:720px){header{padding:14px}header h1{font-size:18px}.wrap{padding:10px}.grid,.summary,.row,.row3,.filters{grid-template-columns:1fr}.stat b{font-size:19px}.card{padding:12px;border-radius:12px}.tablebox{display:none}.mobile-cards{display:block}.btns button{flex:1 1 auto}.money-grid{grid-template-columns:1fr 1fr}.setting-item{grid-template-columns:1fr}}
-@media print{header,.tabs,.filters,.btns,.settings-page,.footer,.no-print,.mobile-cards,#jobEntryPage,#cashPage{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.tablebox{display:block;max-height:none;overflow:visible;border:0}body{background:white}.print-title{display:block;margin:0 0 12px;font-size:20px}th{position:static}table{font-size:11px}th,td{padding:6px}}
+@media(max-width:720px){header{padding:14px}header h1{font-size:18px}.wrap{padding:10px}.grid,.summary,.row,.row3,.filters{grid-template-columns:1fr}.stat b{font-size:19px}.card{padding:12px;border-radius:12px}.tablebox{display:none}.mobile-cards{display:block}.btns button,.home-actions button{flex:1 1 auto}.money-grid{grid-template-columns:1fr 1fr}.setting-item{grid-template-columns:1fr}}
+@media print{header,.tabs,.filters,.btns,.settings-page,.footer,.no-print,.mobile-cards,#jobEntryPage,#cashPage,.home-actions,.source-panel{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.tablebox{display:block;max-height:none;overflow:visible;border:0}body{background:white}.print-title{display:block;margin:0 0 12px;font-size:20px}th{position:static}table{font-size:11px}th,td{padding:6px}}
 </style>
 </head>
 <body>
@@ -102,14 +105,27 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="card stat"><small>Ödeme Yapılacak</small><b id="totalBalance" class="warn">₺0</b></div>
 </section>
 
-<div class="card" style="margin-top:14px">
+<div class="home-actions no-print">
+<button class="primary" onclick="toggleSourcePanel()">İş Kaynakları</button>
+<button class="light" onclick="showDetails()">Detay</button>
+<button class="light" onclick="showTab('jobEntry')">Yeni İş Kaydı</button>
+<button class="light" onclick="showTab('cash')">Kasa Hareketi</button>
+</div>
+
+<div id="sourcePanel" class="card source-panel hidden">
+<h2>İş Kaynağı Seç</h2>
+<select id="homeSourceSelect" onchange="selectHomeSource()"></select>
+<p class="footer">Kaynak seçince üstteki toplamlar o kaynağa göre değişir. Tümünü görmek için “Tüm kaynaklar” seç.</p>
+</div>
+
+<div id="detailPanel" class="card hidden" style="margin-top:14px">
 <h2 class="print-title" id="printTitle">Hakediş Raporu</h2>
 <h2>Ana Sayfa - Hesap Özeti</h2>
 
 <div class="filters">
 <input type="date" id="fStart" onchange="render()">
 <input type="date" id="fEnd" onchange="render()">
-<select id="fSource" onchange="render()"></select>
+<select id="fSource" onchange="syncHomeSourceFromFilter();render()"></select>
 <select id="fStatus" onchange="render()"></select>
 <select id="fService" onchange="render()"></select>
 <input id="fSearch" oninput="render()" placeholder="Ara: müşteri, adres, cihaz">
@@ -119,11 +135,6 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="box"><small>Hakediş</small><b id="sumSource" class="warn">₺0</b></div>
 <div class="box"><small>Ekstra Gider</small><b id="sumCashOut" class="danger">₺0</b></div>
 <div class="box"><small>Ödeme Yapılacak</small><b id="sumBalance" class="warn">₺0</b></div>
-</div>
-
-<div class="btns no-print">
-<button class="primary" onclick="showTab('jobEntry')">Yeni İş Kaydı Ekle</button>
-<button class="light" onclick="showTab('cash')">Kasa Hareketi Ekle</button>
 </div>
 
 <div class="divider"></div>
@@ -394,9 +405,9 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <script>
-const JOB_KEY='ekzen_kaynak_hesap_v6_jobs';
-const CASH_KEY='ekzen_kaynak_hesap_v6_cash';
-const SET_KEY='ekzen_kaynak_hesap_v6_settings';
+const JOB_KEY='ekzen_kaynak_hesap_v7_jobs';
+const CASH_KEY='ekzen_kaynak_hesap_v7_cash';
+const SET_KEY='ekzen_kaynak_hesap_v7_settings';
 
 const defaultSettings={
 title:'Ekzen Teknik - Hakediş Takip',
@@ -408,7 +419,7 @@ statuses:['Hesaplaşılmadı','Hesaplaşıldı','Ödendi','İptal'],
 paymentTypes:['Nakit','IBAN','Kredi Kartı / POS','Alınmadı']
 };
 
-let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v5_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
+let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v6_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v5_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
 let jobs=JSON.parse(localStorage.getItem(JOB_KEY)||'[]');
 
 if(jobs.length===0 && oldJobs.length>0){
@@ -416,7 +427,7 @@ jobs=oldJobs.map(j=>({...j,customerInfo:j.customerInfo||[j.customer,j.phone,j.ad
 localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
 }
 
-let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v5_cash')||localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
+let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v6_cash')||localStorage.getItem('ekzen_kaynak_hesap_v5_cash')||localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
 let cashMoves=JSON.parse(localStorage.getItem(CASH_KEY)||'[]');
 
 if(cashMoves.length===0 && oldCash.length>0){
@@ -426,7 +437,7 @@ localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
 
 let settings={
 ...defaultSettings,
-...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v5_settings')||localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
+...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v6_settings')||localStorage.getItem('ekzen_kaynak_hesap_v5_settings')||localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
 };
 
 const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
@@ -455,7 +466,27 @@ el('tabSettingsBtn').classList.toggle('active',tab==='settings');
 if(tab==='settings') renderSettings();
 if(tab==='cash') renderCashPage();
 if(tab==='jobEntry') renderJobEntryCards();
+if(tab==='home') render();
 window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleSourcePanel(){
+el('sourcePanel').classList.toggle('hidden');
+}
+
+function showDetails(){
+el('detailPanel').classList.remove('hidden');
+render();
+setTimeout(()=>el('detailPanel').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function selectHomeSource(){
+el('fSource').value=el('homeSourceSelect').value;
+render();
+}
+
+function syncHomeSourceFromFilter(){
+el('homeSourceSelect').value=el('fSource').value;
 }
 
 function applySettings(){
@@ -470,6 +501,7 @@ fillSelect('paymentType',settings.paymentTypes);
 fillSelect('cashPaymentType',settings.paymentTypes);
 
 fillSelect('fSource',['',...settings.sources],'Tüm kaynaklar');
+fillSelect('homeSourceSelect',['',...settings.sources],'Tüm kaynaklar');
 fillSelect('fStatus',['',...settings.statuses],'Tüm durumlar');
 fillSelect('fService',['',...settings.serviceTypes],'Tüm işler');
 
@@ -644,12 +676,11 @@ const cashRows=filteredCashForReport();
 const tb=el('tbody'),mobile=el('mobileCards'),cashReportTb=el('cashInReportTbody'),cashReportMobile=el('cashReportMobileCards');
 tb.innerHTML='';mobile.innerHTML='';cashReportTb.innerHTML='';cashReportMobile.innerHTML='';
 
-let sourceShareTotal=0,myTotal=0,cashIn=0,cashOut=0;
+let sourceShareTotal=0,cashIn=0,cashOut=0;
 
 rows.forEach(x=>{
 const c=calc(x);
 sourceShareTotal+=c.sourceShare;
-myTotal+=c.myShare;
 
 const tr=document.createElement('tr');
 tr.innerHTML=`
@@ -736,15 +767,19 @@ jobs.slice(0,8).forEach(x=>box.appendChild(jobCard(x,calc(x))));
 }
 
 function updateStats(){
+const src=val('fSource');
 let tc=0,tm=0,hak=0,cashIn=0,cashOut=0;
-jobs.filter(x=>x.status!=='İptal').forEach(x=>{
+
+jobs.filter(x=>x.status!=='İptal' && (!src || x.source===src)).forEach(x=>{
 const c=calc(x);
 tc+=c.collection;tm+=c.material;hak+=c.sourceShare;
 });
-cashMoves.forEach(x=>{
+
+cashMoves.filter(x=>(!src || x.source===src)).forEach(x=>{
 if(x.type==='in')cashIn+=Number(x.amount||0);
 if(x.type==='out')cashOut+=Number(x.amount||0);
 });
+
 const ekstraGider=cashOut-cashIn;
 const balance=hak+cashIn-cashOut;
 el('totalCollection').textContent=fmt(tc);
@@ -894,7 +929,8 @@ el('printTitle').textContent=`${src} - Hakediş Raporu (${start} / ${end})`;
 function printReport(){
 updatePrintTitle();
 showTab('home');
-setTimeout(()=>window.print(),150);
+showDetails();
+setTimeout(()=>window.print(),200);
 }
 
 function exportCSV(){
