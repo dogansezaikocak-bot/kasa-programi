@@ -1,491 +1,436 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ekzen Teknik - Hakediş Takip</title>
-  <style>
-    :root{
-      --bg:#f4f6f8;--card:#fff;--text:#172033;--muted:#667085;--border:#d9dee8;
-      --primary:#0f62fe;--dark:#111827;--danger:#d92d20;--ok:#039855;--warn:#dc6803;--soft:#f8fafc;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
-    header{background:var(--dark);color:white;padding:16px}
-    .header-inner{max-width:1280px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    header h1{font-size:21px;margin:0}
-    header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
-    .wrap{max-width:1280px;margin:0 auto;padding:14px}
-    .tabs{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
-    .tab-btn{white-space:nowrap;border:1px solid var(--border);background:white;color:#182230;border-radius:999px;padding:10px 14px;font-weight:700;cursor:pointer}
-    .tab-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
-    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);min-width:0}
-    .stat small{color:var(--muted);font-size:12px}
-    .stat b{display:block;font-size:21px;margin-top:7px;overflow-wrap:anywhere}
-    .ok{color:var(--ok)}.danger{color:var(--danger)}.warn{color:var(--warn)}
-    .layout{display:grid;grid-template-columns:390px 1fr;gap:14px;margin-top:14px;align-items:start}
-    h2{margin:0 0 12px;font-size:18px}
-    label{display:block;font-size:13px;color:#344054;margin:10px 0 5px;font-weight:700}
-    input,select,textarea{width:100%;max-width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:14px;background:white;color:var(--text)}
-    textarea{min-height:72px;resize:vertical}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;font-size:14px}
-    .primary{background:var(--primary);color:white}
-    .light{background:#eef2f7;color:#182230}
-    .red{background:#fee4e2;color:#b42318}
-    .orange{background:#ffead5;color:#9a3412}
-    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    table{width:100%;border-collapse:collapse;font-size:13px}
-    th,td{padding:9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;overflow-wrap:anywhere}
-    th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index:1}
-    .right{text-align:right}
-    .tablebox{max-height:570px;overflow:auto;border:1px solid var(--border);border-radius:12px}
-    .filters{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
-    .done{background:#dcfae6;color:#067647}
-    .pending{background:#fff4cc;color:#8a6100}
-    .paid{background:#e0eaff;color:#1849a9}
-    .cancel{background:#fee4e2;color:#b42318}
-    .cashin{background:#dcfae6;color:#067647}
-    .cashout{background:#fee4e2;color:#b42318}
-    .muted{color:var(--muted);font-size:12px}
-    .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:10px 0}
-    .summary .box{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px;min-width:0}
-    .summary .box small{color:var(--muted);font-size:12px}
-    .summary .box b{display:block;margin-top:5px;font-size:18px;overflow-wrap:anywhere}
-    .footer{color:#667085;font-size:12px;margin-top:14px;line-height:1.4}
-    .print-title{display:none}
-    .settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-    .setting-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-    .setting-item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:0}
-    .setting-item span{overflow-wrap:anywhere;font-weight:700;font-size:14px}
-    .mobile-cards{display:none}
-    .job-card{border:1px solid var(--border);border-radius:14px;padding:12px;background:white;margin-bottom:10px}
-    .job-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
-    .job-card h3{margin:0;font-size:16px;overflow-wrap:anywhere}
-    .job-card p{margin:6px 0;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
-    .money-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-    .money-grid div{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:8px}
-    .money-grid small{color:var(--muted);display:block;font-size:11px}
-    .money-grid b{font-size:14px;overflow-wrap:anywhere}
-    .hidden{display:none!important}
-    .divider{height:1px;background:var(--border);margin:14px 0}
-    @media(max-width:1100px){
-      .grid{grid-template-columns:1fr 1fr}
-      .layout{grid-template-columns:1fr}
-      .filters{grid-template-columns:1fr 1fr}
-      .summary{grid-template-columns:1fr 1fr}
-      .settings-grid{grid-template-columns:1fr}
-    }
-    @media(max-width:720px){
-      header{padding:14px}
-      header h1{font-size:18px}
-      .wrap{padding:10px}
-      .grid,.summary,.row,.row3,.filters{grid-template-columns:1fr}
-      .stat b{font-size:19px}
-      .card{padding:12px;border-radius:12px}
-      .tablebox{display:none}
-      .mobile-cards{display:block}
-      .btns button{flex:1 1 auto}
-      .money-grid{grid-template-columns:1fr 1fr}
-      .setting-item{grid-template-columns:1fr}
-    }
-    @media print{
-      header,.formcard,.filters,.btns,.tabs,.settings-page,.footer,.no-print,.mobile-cards{display:none!important}
-      .wrap{max-width:none;padding:0}
-      .card{box-shadow:none;border:0}
-      .layout{display:block}
-      .tablebox{display:block;max-height:none;overflow:visible;border:0}
-      body{background:white}
-      .print-title{display:block;margin:0 0 12px;font-size:20px}
-      th{position:static}
-      table{font-size:11px}
-      th,td{padding:6px}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ekzen Teknik - Hakediş Takip</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--text:#172033;--muted:#667085;--border:#d9dee8;--primary:#0f62fe;--dark:#111827;--danger:#d92d20;--ok:#039855;--warn:#dc6803;--soft:#f8fafc}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+header{background:var(--dark);color:white;padding:16px}
+.header-inner{max-width:1280px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header h1{font-size:21px;margin:0}
+header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
+.wrap{max-width:1280px;margin:0 auto;padding:14px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.tab-btn{white-space:nowrap;border:1px solid var(--border);background:white;color:#182230;border-radius:999px;padding:10px 14px;font-weight:700;cursor:pointer}
+.tab-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);min-width:0}
+.stat small{color:var(--muted);font-size:12px}
+.stat b{display:block;font-size:21px;margin-top:7px;overflow-wrap:anywhere}
+.ok{color:var(--ok)}.danger{color:var(--danger)}.warn{color:var(--warn)}
+.layout{display:grid;grid-template-columns:390px 1fr;gap:14px;margin-top:14px;align-items:start}
+h2{margin:0 0 12px;font-size:18px}
+label{display:block;font-size:13px;color:#344054;margin:10px 0 5px;font-weight:700}
+input,select,textarea{width:100%;max-width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font-size:14px;background:white;color:var(--text)}
+textarea{min-height:72px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+button{border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;font-size:14px}
+.primary{background:var(--primary);color:white}
+.light{background:#eef2f7;color:#182230}
+.red{background:#fee4e2;color:#b42318}
+.orange{background:#ffead5;color:#9a3412}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;overflow-wrap:anywhere}
+th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index:1}
+.right{text-align:right}
+.tablebox{max-height:570px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+.filters{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.done{background:#dcfae6;color:#067647}.pending{background:#fff4cc;color:#8a6100}.paid{background:#e0eaff;color:#1849a9}.cancel{background:#fee4e2;color:#b42318}
+.cashin{background:#dcfae6;color:#067647}.cashout{background:#fee4e2;color:#b42318}
+.muted{color:var(--muted);font-size:12px}
+.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:10px 0}
+.summary .box{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px;min-width:0}
+.summary .box small{color:var(--muted);font-size:12px}
+.summary .box b{display:block;margin-top:5px;font-size:18px;overflow-wrap:anywhere}
+.footer{color:#667085;font-size:12px;margin-top:14px;line-height:1.4}
+.print-title{display:none}
+.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.setting-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.setting-item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:8px;min-width:0}
+.setting-item span{overflow-wrap:anywhere;font-weight:700;font-size:14px}
+.mobile-cards{display:none}
+.job-card{border:1px solid var(--border);border-radius:14px;padding:12px;background:white;margin-bottom:10px}
+.job-card-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.job-card h3{margin:0;font-size:16px;overflow-wrap:anywhere}
+.job-card p{margin:6px 0;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.money-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.money-grid div{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:8px}
+.money-grid small{color:var(--muted);display:block;font-size:11px}
+.money-grid b{font-size:14px;overflow-wrap:anywhere}
+.hidden{display:none!important}
+.divider{height:1px;background:var(--border);margin:14px 0}
+@media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.summary{grid-template-columns:1fr 1fr}.settings-grid{grid-template-columns:1fr}}
+@media(max-width:720px){header{padding:14px}header h1{font-size:18px}.wrap{padding:10px}.grid,.summary,.row,.row3,.filters{grid-template-columns:1fr}.stat b{font-size:19px}.card{padding:12px;border-radius:12px}.tablebox{display:none}.mobile-cards{display:block}.btns button{flex:1 1 auto}.money-grid{grid-template-columns:1fr 1fr}.setting-item{grid-template-columns:1fr}}
+@media print{header,.tabs,.filters,.btns,.settings-page,.footer,.no-print,.mobile-cards,#jobEntryPage,#cashPage{display:none!important}.wrap{max-width:none;padding:0}.card{box-shadow:none;border:0}.tablebox{display:block;max-height:none;overflow:visible;border:0}body{background:white}.print-title{display:block;margin:0 0 12px;font-size:20px}th{position:static}table{font-size:11px}th,td{padding:6px}}
+</style>
 </head>
-
 <body>
 <header>
-  <div class="header-inner">
-    <div>
-      <h1 id="appTitle">Ekzen Teknik - Hakediş Takip</h1>
-      <p id="appSubtitle">İş kaynağı bazlı hakediş, ekstra gider ve ödeme raporu</p>
-    </div>
-    <div class="btns">
-      <button class="light" onclick="printReport()">PDF / Yazdır</button>
-      <button class="light" onclick="exportCSV()">CSV Aktar</button>
-      <button class="red" onclick="resetAll()">Tümünü Sil</button>
-    </div>
-  </div>
+<div class="header-inner">
+<div>
+<h1 id="appTitle">Ekzen Teknik - Hakediş Takip</h1>
+<p id="appSubtitle">İş kaynağı bazlı hakediş, ekstra gider ve ödeme raporu</p>
+</div>
+<div class="btns">
+<button class="light" onclick="printReport()">PDF / Yazdır</button>
+<button class="light" onclick="exportCSV()">CSV Aktar</button>
+<button class="red" onclick="resetAll()">Tümünü Sil</button>
+</div>
+</div>
 </header>
 
 <div class="wrap">
-  <div class="tabs">
-    <button class="tab-btn active" id="tabJobsBtn" onclick="showTab('jobs')">İş Kayıtları</button>
-    <button class="tab-btn" id="tabCashBtn" onclick="showTab('cash')">Kasa Giriş / Çıkış</button>
-    <button class="tab-btn" id="tabSettingsBtn" onclick="showTab('settings')">Ayarlar</button>
-  </div>
+<div class="tabs">
+<button class="tab-btn active" id="tabHomeBtn" onclick="showTab('home')">Ana Sayfa</button>
+<button class="tab-btn" id="tabJobsBtn" onclick="showTab('jobEntry')">İş Kayıtları</button>
+<button class="tab-btn" id="tabCashBtn" onclick="showTab('cash')">Kasa Giriş / Çıkış</button>
+<button class="tab-btn" id="tabSettingsBtn" onclick="showTab('settings')">Ayarlar</button>
+</div>
 
-  <div id="jobsPage">
-    <section class="grid">
-      <div class="card stat"><small>Toplam Tahsilat</small><b id="totalCollection">₺0</b></div>
-      <div class="card stat"><small>Toplam Malzeme</small><b id="totalMaterial" class="danger">₺0</b></div>
-      <div class="card stat"><small>Hakediş</small><b id="totalSourceShare" class="warn">₺0</b></div>
-      <div class="card stat"><small>Ekstra Gider</small><b id="totalCashNet">₺0</b></div>
-      <div class="card stat"><small>Ödeme Yapılacak</small><b id="totalBalance" class="warn">₺0</b></div>
-    </section>
+<div id="homePage">
+<section class="grid">
+<div class="card stat"><small>Toplam Tahsilat</small><b id="totalCollection">₺0</b></div>
+<div class="card stat"><small>Toplam Malzeme</small><b id="totalMaterial" class="danger">₺0</b></div>
+<div class="card stat"><small>Hakediş</small><b id="totalSourceShare" class="warn">₺0</b></div>
+<div class="card stat"><small>Ekstra Gider</small><b id="totalCashNet">₺0</b></div>
+<div class="card stat"><small>Ödeme Yapılacak</small><b id="totalBalance" class="warn">₺0</b></div>
+</section>
 
-    <section class="layout">
-      <div class="card formcard">
-        <h2>Yeni İş Kaydı</h2>
-        <input type="hidden" id="editId">
+<div class="card" style="margin-top:14px">
+<h2 class="print-title" id="printTitle">Hakediş Raporu</h2>
+<h2>Ana Sayfa - Hesap Özeti</h2>
 
-        <div class="row">
-          <div>
-            <label>Tarih</label>
-            <input type="date" id="date">
-          </div>
-          <div>
-            <label>İş Kaynağı</label>
-            <select id="source"></select>
-          </div>
-        </div>
+<div class="filters">
+<input type="date" id="fStart" onchange="render()">
+<input type="date" id="fEnd" onchange="render()">
+<select id="fSource" onchange="render()"></select>
+<select id="fStatus" onchange="render()"></select>
+<select id="fService" onchange="render()"></select>
+<input id="fSearch" oninput="render()" placeholder="Ara: müşteri, adres, cihaz">
+</div>
 
-        <div class="row">
-          <div>
-            <label>İş Alanı</label>
-            <select id="serviceType"></select>
-          </div>
-          <div>
-            <label>Cihaz</label>
-            <input id="device" placeholder="Örn: Çamaşır makinesi / Vaillant kombi">
-          </div>
-        </div>
+<div class="summary">
+<div class="box"><small>Hakediş</small><b id="sumSource" class="warn">₺0</b></div>
+<div class="box"><small>Para Girişi</small><b id="sumCashIn" class="ok">₺0</b></div>
+<div class="box"><small>Ekstra Gider</small><b id="sumCashOut" class="danger">₺0</b></div>
+<div class="box"><small>Ödeme Yapılacak</small><b id="sumBalance" class="warn">₺0</b></div>
+<div class="box"><small>Sana Kalan</small><b id="sumMine" class="ok">₺0</b></div>
+</div>
 
-        <label>Müşteri / Adres</label>
-        <textarea id="customerInfo" placeholder="Örn: Ahmet Yılmaz - Saray Mahallesi, bina/daire bilgisi"></textarea>
+<div class="btns no-print">
+<button class="primary" onclick="showTab('jobEntry')">Yeni İş Kaydı Ekle</button>
+<button class="light" onclick="showTab('cash')">Kasa Hareketi Ekle</button>
+</div>
 
-        <label>Yapılan İş / Arıza Açıklaması</label>
-        <textarea id="jobNote" placeholder="Örn: Kombi F1 arızası, elektrot temizliği, bakım yapıldı"></textarea>
+<div class="divider"></div>
+<h2>İş Kayıtları</h2>
 
-        <div class="row3">
-          <div>
-            <label>Tahsilat</label>
-            <input type="number" id="collection" min="0" step="0.01" placeholder="Örn: 2500">
-          </div>
-          <div>
-            <label>Malzeme</label>
-            <input type="number" id="material" min="0" step="0.01" placeholder="Örn: 800">
-          </div>
-          <div>
-            <label>Kaynak Payı %</label>
-            <input type="number" id="sourceRate" min="0" max="100" step="1" value="50">
-          </div>
-        </div>
+<div class="tablebox">
+<table>
+<thead>
+<tr>
+<th>Tarih</th><th>Kaynak</th><th>Müşteri / Adres</th><th>İş</th>
+<th class="right">Tahsilat</th><th class="right">Malzeme</th><th class="right">Hakediş</th><th class="right">Sana Kalan</th><th>Durum</th><th class="no-print">İşlem</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
 
-        <div class="row">
-          <div>
-            <label>Durum</label>
-            <select id="status"></select>
-          </div>
-          <div>
-            <label>Tahsilat Şekli</label>
-            <select id="paymentType"></select>
-          </div>
-        </div>
+<div class="mobile-cards" id="mobileCards"></div>
 
-        <div class="btns">
-          <button class="primary" onclick="saveJob()">Kaydet</button>
-          <button class="light" onclick="clearForm()">Temizle</button>
-        </div>
+<div class="divider"></div>
+<h2>Filtreye Dahil Kasa Hareketleri</h2>
 
-        <p class="footer">Formül: Tahsilat - Malzeme = Net. Net tutarın kaynak payı hakediş olarak hesaplanır.</p>
-      </div>
+<div class="tablebox">
+<table>
+<thead>
+<tr>
+<th>Tarih</th><th>Kaynak</th><th>Tür</th><th>Açıklama</th><th>Ödeme Şekli</th><th class="right">Tutar</th>
+</tr>
+</thead>
+<tbody id="cashInReportTbody"></tbody>
+</table>
+</div>
 
-      <div class="card">
-        <h2 class="print-title" id="printTitle">Hakediş Raporu</h2>
-        <h2>İş Kayıtları ve Hesaplaşma</h2>
+<div class="mobile-cards" id="cashReportMobileCards"></div>
+<p class="muted" id="countText"></p>
+</div>
+</div>
 
-        <div class="filters">
-          <input type="date" id="fStart" onchange="render()">
-          <input type="date" id="fEnd" onchange="render()">
-          <select id="fSource" onchange="render()"></select>
-          <select id="fStatus" onchange="render()"></select>
-          <select id="fService" onchange="render()"></select>
-          <input id="fSearch" oninput="render()" placeholder="Ara: müşteri, adres, cihaz">
-        </div>
+<div id="jobEntryPage" class="hidden">
+<section class="layout">
+<div class="card">
+<h2>Yeni İş Kaydı</h2>
+<input type="hidden" id="editId">
 
-        <div class="summary">
-          <div class="box"><small>Hakediş</small><b id="sumSource" class="warn">₺0</b></div>
-          <div class="box"><small>Para Girişi</small><b id="sumCashIn" class="ok">₺0</b></div>
-          <div class="box"><small>Ekstra Gider</small><b id="sumCashOut" class="danger">₺0</b></div>
-          <div class="box"><small>Ödeme Yapılacak</small><b id="sumBalance" class="warn">₺0</b></div>
-          <div class="box"><small>Sana Kalan</small><b id="sumMine" class="ok">₺0</b></div>
-        </div>
+<div class="row">
+<div>
+<label>Tarih</label>
+<input type="date" id="date">
+</div>
+<div>
+<label>İş Kaynağı</label>
+<select id="source"></select>
+</div>
+</div>
 
-        <div class="tablebox">
-          <table>
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Kaynak</th>
-                <th>Müşteri / Adres</th>
-                <th>İş</th>
-                <th class="right">Tahsilat</th>
-                <th class="right">Malzeme</th>
-                <th class="right">Hakediş</th>
-                <th class="right">Sana Kalan</th>
-                <th>Durum</th>
-                <th class="no-print">İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
+<div class="row">
+<div>
+<label>İş Alanı</label>
+<select id="serviceType"></select>
+</div>
+<div>
+<label>Cihaz</label>
+<input id="device" placeholder="Örn: Çamaşır makinesi / Vaillant kombi">
+</div>
+</div>
 
-        <div class="mobile-cards" id="mobileCards"></div>
+<label>Müşteri / Adres</label>
+<textarea id="customerInfo" placeholder="Örn: Ahmet Yılmaz - Saray Mahallesi, bina/daire bilgisi"></textarea>
 
-        <div class="divider"></div>
+<label>Yapılan İş / Arıza Açıklaması</label>
+<textarea id="jobNote" placeholder="Örn: Kombi F1 arızası, elektrot temizliği, bakım yapıldı"></textarea>
 
-        <h2>Filtreye Dahil Kasa Hareketleri</h2>
-        <div class="tablebox">
-          <table>
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Kaynak</th>
-                <th>Tür</th>
-                <th>Açıklama</th>
-                <th>Ödeme Şekli</th>
-                <th class="right">Tutar</th>
-              </tr>
-            </thead>
-            <tbody id="cashInReportTbody"></tbody>
-          </table>
-        </div>
+<div class="row3">
+<div>
+<label>Tahsilat</label>
+<input type="number" id="collection" min="0" step="0.01" placeholder="Örn: 2500">
+</div>
+<div>
+<label>Malzeme</label>
+<input type="number" id="material" min="0" step="0.01" placeholder="Örn: 800">
+</div>
+<div>
+<label>Kaynak Payı %</label>
+<input type="number" id="sourceRate" min="0" max="100" step="1" value="50">
+</div>
+</div>
 
-        <div class="mobile-cards" id="cashReportMobileCards"></div>
+<div class="row">
+<div>
+<label>Durum</label>
+<select id="status"></select>
+</div>
+<div>
+<label>Tahsilat Şekli</label>
+<select id="paymentType"></select>
+</div>
+</div>
 
-        <p class="muted" id="countText"></p>
-      </div>
-    </section>
-  </div>
+<div class="btns">
+<button class="primary" onclick="saveJob()">Kaydet</button>
+<button class="light" onclick="clearForm()">Temizle</button>
+<button class="light" onclick="showTab('home')">Ana Sayfaya Dön</button>
+</div>
 
-  <div id="cashPage" class="hidden">
-    <section class="layout">
-      <div class="card formcard">
-        <h2>Kasa Giriş / Çıkış Ekle</h2>
-        <input type="hidden" id="cashEditId">
+<p class="footer">Formül: Tahsilat - Malzeme = Net. Net tutarın kaynak payı hakediş olarak hesaplanır.</p>
+</div>
 
-        <div class="row">
-          <div>
-            <label>Tarih</label>
-            <input type="date" id="cashDate">
-          </div>
-          <div>
-            <label>İş Kaynağı</label>
-            <select id="cashSource"></select>
-          </div>
-        </div>
+<div class="card">
+<h2>Son İş Kayıtları</h2>
+<div class="mobile-cards" style="display:block" id="jobEntryCards"></div>
+</div>
+</section>
+</div>
 
-        <div class="row">
-          <div>
-            <label>Hareket Türü</label>
-            <select id="cashType">
-              <option value="in">Para Girişi</option>
-              <option value="out">Para Çıkışı</option>
-            </select>
-          </div>
-          <div>
-            <label>Tutar</label>
-            <input type="number" id="cashAmount" min="0" step="0.01" placeholder="Örn: 1000">
-          </div>
-        </div>
+<div id="cashPage" class="hidden">
+<section class="layout">
+<div class="card">
+<h2>Kasa Giriş / Çıkış Ekle</h2>
+<input type="hidden" id="cashEditId">
 
-        <div class="row">
-          <div>
-            <label>Ödeme Şekli</label>
-            <select id="cashPaymentType"></select>
-          </div>
-          <div>
-            <label>Kategori</label>
-            <input id="cashCategory" placeholder="Örn: Avans / Ödeme / Emanet">
-          </div>
-        </div>
+<div class="row">
+<div>
+<label>Tarih</label>
+<input type="date" id="cashDate">
+</div>
+<div>
+<label>İş Kaynağı</label>
+<select id="cashSource"></select>
+</div>
+</div>
 
-        <label>Açıklama</label>
-        <textarea id="cashNote" placeholder="Örn: Ahmet Usta'ya ödeme yapıldı"></textarea>
+<div class="row">
+<div>
+<label>Hareket Türü</label>
+<select id="cashType">
+<option value="in">Para Girişi</option>
+<option value="out">Ekstra Gider</option>
+</select>
+</div>
+<div>
+<label>Tutar</label>
+<input type="number" id="cashAmount" min="0" step="0.01" placeholder="Örn: 1000">
+</div>
+</div>
 
-        <div class="btns">
-          <button class="primary" onclick="saveCashMove()">Kaydet</button>
-          <button class="light" onclick="clearCashForm()">Temizle</button>
-        </div>
+<div class="row">
+<div>
+<label>Ödeme Şekli</label>
+<select id="cashPaymentType"></select>
+</div>
+<div>
+<label>Kategori</label>
+<input id="cashCategory" placeholder="Örn: Avans / Ödeme / Emanet">
+</div>
+</div>
 
-        <p class="footer">
-          Para çıkışı ekstra gider olarak görünür ve ödeme yapılacak tutardan düşer.
-          Para girişi ise ödeme yapılacak tutara eklenir.
-        </p>
-      </div>
+<label>Açıklama</label>
+<textarea id="cashNote" placeholder="Örn: Ahmet Usta'ya ödeme yapıldı"></textarea>
 
-      <div class="card">
-        <h2>Kasa Hareketleri</h2>
+<div class="btns">
+<button class="primary" onclick="saveCashMove()">Kaydet</button>
+<button class="light" onclick="clearCashForm()">Temizle</button>
+<button class="light" onclick="showTab('home')">Ana Sayfaya Dön</button>
+</div>
+</div>
 
-        <div class="filters">
-          <input type="date" id="cfStart" onchange="renderCashPage()">
-          <input type="date" id="cfEnd" onchange="renderCashPage()">
-          <select id="cfSource" onchange="renderCashPage()"></select>
-          <select id="cfType" onchange="renderCashPage()">
-            <option value="">Tüm hareketler</option>
-            <option value="in">Para Girişi</option>
-            <option value="out">Para Çıkışı</option>
-          </select>
-          <select id="cfPayment" onchange="renderCashPage()"></select>
-          <input id="cfSearch" oninput="renderCashPage()" placeholder="Ara: açıklama, kategori">
-        </div>
+<div class="card">
+<h2>Kasa Hareketleri</h2>
 
-        <div class="summary">
-          <div class="box"><small>Para Girişi</small><b id="cashPageIn" class="ok">₺0</b></div>
-          <div class="box"><small>Ekstra Gider</small><b id="cashPageOut" class="danger">₺0</b></div>
-          <div class="box"><small>Net Hareket</small><b id="cashPageNet">₺0</b></div>
-          <div class="box"><small>Kayıt Sayısı</small><b id="cashPageCount">0</b></div>
-          <div class="box"><small>Seçili Kaynak</small><b id="cashPageSource">Tümü</b></div>
-        </div>
+<div class="filters">
+<input type="date" id="cfStart" onchange="renderCashPage()">
+<input type="date" id="cfEnd" onchange="renderCashPage()">
+<select id="cfSource" onchange="renderCashPage()"></select>
+<select id="cfType" onchange="renderCashPage()">
+<option value="">Tüm hareketler</option>
+<option value="in">Para Girişi</option>
+<option value="out">Ekstra Gider</option>
+</select>
+<select id="cfPayment" onchange="renderCashPage()"></select>
+<input id="cfSearch" oninput="renderCashPage()" placeholder="Ara: açıklama, kategori">
+</div>
 
-        <div class="tablebox">
-          <table>
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Kaynak</th>
-                <th>Tür</th>
-                <th>Kategori</th>
-                <th>Açıklama</th>
-                <th>Ödeme Şekli</th>
-                <th class="right">Tutar</th>
-                <th class="no-print">İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="cashTbody"></tbody>
-          </table>
-        </div>
+<div class="summary">
+<div class="box"><small>Para Girişi</small><b id="cashPageIn" class="ok">₺0</b></div>
+<div class="box"><small>Ekstra Gider</small><b id="cashPageOut" class="danger">₺0</b></div>
+<div class="box"><small>Net Hareket</small><b id="cashPageNet">₺0</b></div>
+<div class="box"><small>Kayıt Sayısı</small><b id="cashPageCount">0</b></div>
+<div class="box"><small>Seçili Kaynak</small><b id="cashPageSource">Tümü</b></div>
+</div>
 
-        <div class="mobile-cards" id="cashMobileCards"></div>
-      </div>
-    </section>
-  </div>
+<div class="tablebox">
+<table>
+<thead>
+<tr>
+<th>Tarih</th><th>Kaynak</th><th>Tür</th><th>Kategori</th><th>Açıklama</th><th>Ödeme Şekli</th><th class="right">Tutar</th><th class="no-print">İşlem</th>
+</tr>
+</thead>
+<tbody id="cashTbody"></tbody>
+</table>
+</div>
 
-  <div id="settingsPage" class="settings-page hidden">
-    <div class="settings-grid">
-      <div class="card">
-        <h2>Genel Başlıklar</h2>
-        <label>Program Başlığı</label>
-        <input id="setTitle" placeholder="Program başlığı">
+<div class="mobile-cards" id="cashMobileCards"></div>
+</div>
+</section>
+</div>
 
-        <label>Alt Açıklama</label>
-        <input id="setSubtitle" placeholder="Alt açıklama">
+<div id="settingsPage" class="settings-page hidden">
+<div class="settings-grid">
+<div class="card">
+<h2>Genel Başlıklar</h2>
+<label>Program Başlığı</label>
+<input id="setTitle" placeholder="Program başlığı">
+<label>Alt Açıklama</label>
+<input id="setSubtitle" placeholder="Alt açıklama">
+<label>Varsayılan Kaynak Payı %</label>
+<input id="setDefaultRate" type="number" min="0" max="100" step="1">
+<div class="btns"><button class="primary" onclick="saveGeneralSettings()">Genel Ayarları Kaydet</button></div>
+</div>
 
-        <label>Varsayılan Kaynak Payı %</label>
-        <input id="setDefaultRate" type="number" min="0" max="100" step="1">
+<div class="card">
+<h2>İş Kaynakları</h2>
+<label>Yeni İş Kaynağı</label>
+<div class="row">
+<input id="newSource" placeholder="Örn: Ahmet Usta">
+<button class="primary" onclick="addSettingItem('sources','newSource')">Ekle</button>
+</div>
+<div class="setting-list" id="sourceSettingsList"></div>
+</div>
 
-        <div class="btns">
-          <button class="primary" onclick="saveGeneralSettings()">Genel Ayarları Kaydet</button>
-        </div>
-      </div>
+<div class="card">
+<h2>İş Alanları</h2>
+<label>Yeni İş Alanı</label>
+<div class="row">
+<input id="newServiceType" placeholder="Örn: Kombi">
+<button class="primary" onclick="addSettingItem('serviceTypes','newServiceType')">Ekle</button>
+</div>
+<div class="setting-list" id="serviceTypeSettingsList"></div>
+</div>
 
-      <div class="card">
-        <h2>İş Kaynakları</h2>
-        <label>Yeni İş Kaynağı</label>
-        <div class="row">
-          <input id="newSource" placeholder="Örn: Ahmet Usta">
-          <button class="primary" onclick="addSettingItem('sources','newSource')">Ekle</button>
-        </div>
-        <div class="setting-list" id="sourceSettingsList"></div>
-      </div>
+<div class="card">
+<h2>Durumlar</h2>
+<label>Yeni Durum</label>
+<div class="row">
+<input id="newStatus" placeholder="Örn: Ödendi">
+<button class="primary" onclick="addSettingItem('statuses','newStatus')">Ekle</button>
+</div>
+<div class="setting-list" id="statusSettingsList"></div>
+</div>
 
-      <div class="card">
-        <h2>İş Alanları</h2>
-        <label>Yeni İş Alanı</label>
-        <div class="row">
-          <input id="newServiceType" placeholder="Örn: Kombi">
-          <button class="primary" onclick="addSettingItem('serviceTypes','newServiceType')">Ekle</button>
-        </div>
-        <div class="setting-list" id="serviceTypeSettingsList"></div>
-      </div>
+<div class="card">
+<h2>Tahsilat Şekilleri</h2>
+<label>Yeni Tahsilat Şekli</label>
+<div class="row">
+<input id="newPaymentType" placeholder="Örn: Nakit">
+<button class="primary" onclick="addSettingItem('paymentTypes','newPaymentType')">Ekle</button>
+</div>
+<div class="setting-list" id="paymentTypeSettingsList"></div>
+</div>
 
-      <div class="card">
-        <h2>Durumlar</h2>
-        <label>Yeni Durum</label>
-        <div class="row">
-          <input id="newStatus" placeholder="Örn: Ödendi">
-          <button class="primary" onclick="addSettingItem('statuses','newStatus')">Ekle</button>
-        </div>
-        <div class="setting-list" id="statusSettingsList"></div>
-      </div>
-
-      <div class="card">
-        <h2>Tahsilat Şekilleri</h2>
-        <label>Yeni Tahsilat Şekli</label>
-        <div class="row">
-          <input id="newPaymentType" placeholder="Örn: Nakit">
-          <button class="primary" onclick="addSettingItem('paymentTypes','newPaymentType')">Ekle</button>
-        </div>
-        <div class="setting-list" id="paymentTypeSettingsList"></div>
-      </div>
-
-      <div class="card">
-        <h2>Yedek</h2>
-        <p class="footer">
-          Kayıtlar bu cihazın tarayıcısında saklanır. Telefon ve bilgisayar arasında otomatik eşitleme yoktur.
-        </p>
-        <div class="btns">
-          <button class="light" onclick="exportCSV()">CSV Yedek Al</button>
-          <button class="orange" onclick="resetSettings()">Ayarları Sıfırla</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="card">
+<h2>Yedek</h2>
+<p class="footer">Kayıtlar bu cihazın tarayıcısında saklanır. Telefon ve bilgisayar arasında otomatik eşitleme yoktur.</p>
+<div class="btns">
+<button class="light" onclick="exportCSV()">CSV Yedek Al</button>
+<button class="orange" onclick="resetSettings()">Ayarları Sıfırla</button>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <script>
-const JOB_KEY='ekzen_kaynak_hesap_v4_jobs';
-const CASH_KEY='ekzen_kaynak_hesap_v4_cash';
-const SET_KEY='ekzen_kaynak_hesap_v4_settings';
+const JOB_KEY='ekzen_kaynak_hesap_v5_jobs';
+const CASH_KEY='ekzen_kaynak_hesap_v5_cash';
+const SET_KEY='ekzen_kaynak_hesap_v5_settings';
 
 const defaultSettings={
-  title:'Ekzen Teknik - Hakediş Takip',
-  subtitle:'İş kaynağı bazlı hakediş, ekstra gider ve ödeme raporu',
-  defaultRate:50,
-  sources:['Kaynak 1','Kaynak 2'],
-  serviceTypes:['Beyaz Eşya','Kombi','Klima','Diğer'],
-  statuses:['Hesaplaşılmadı','Hesaplaşıldı','Ödendi','İptal'],
-  paymentTypes:['Nakit','IBAN','Kredi Kartı / POS','Alınmadı']
+title:'Ekzen Teknik - Hakediş Takip',
+subtitle:'İş kaynağı bazlı hakediş, ekstra gider ve ödeme raporu',
+defaultRate:50,
+sources:['Kaynak 1','Kaynak 2'],
+serviceTypes:['Beyaz Eşya','Kombi','Klima','Diğer'],
+statuses:['Hesaplaşılmadı','Hesaplaşıldı','Ödendi','İptal'],
+paymentTypes:['Nakit','IBAN','Kredi Kartı / POS','Alınmadı']
 };
 
-let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
+let oldJobs=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v4_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v3_jobs')||localStorage.getItem('ekzen_kaynak_hesap_v2_jobs')||'[]');
 let jobs=JSON.parse(localStorage.getItem(JOB_KEY)||'[]');
 
 if(jobs.length===0 && oldJobs.length>0){
-  jobs=oldJobs.map(j=>({
-    ...j,
-    customerInfo:j.customerInfo || [j.customer,j.phone,j.address].filter(Boolean).join(' - ')
-  }));
-  localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
+jobs=oldJobs.map(j=>({...j,customerInfo:j.customerInfo||[j.customer,j.phone,j.address].filter(Boolean).join(' - ')}));
+localStorage.setItem(JOB_KEY,JSON.stringify(jobs));
 }
 
-let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
+let oldCash=JSON.parse(localStorage.getItem('ekzen_kaynak_hesap_v4_cash')||localStorage.getItem('ekzen_kaynak_hesap_v3_cash')||'[]');
 let cashMoves=JSON.parse(localStorage.getItem(CASH_KEY)||'[]');
 
 if(cashMoves.length===0 && oldCash.length>0){
-  cashMoves=oldCash;
-  localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
+cashMoves=oldCash;
+localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves));
 }
 
 let settings={
-  ...defaultSettings,
-  ...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
+...defaultSettings,
+...JSON.parse(localStorage.getItem(SET_KEY)||localStorage.getItem('ekzen_kaynak_hesap_v4_settings')||localStorage.getItem('ekzen_kaynak_hesap_v3_settings')||localStorage.getItem('ekzen_kaynak_hesap_v2_settings')||'{}')
 };
 
 const fmt=n=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(Number(n||0));
@@ -501,694 +446,493 @@ function saveCash(){localStorage.setItem(CASH_KEY,JSON.stringify(cashMoves))}
 function saveSettings(){localStorage.setItem(SET_KEY,JSON.stringify(settings))}
 
 function showTab(tab){
-  el('jobsPage').classList.toggle('hidden',tab!=='jobs');
-  el('cashPage').classList.toggle('hidden',tab!=='cash');
-  el('settingsPage').classList.toggle('hidden',tab!=='settings');
-  el('tabJobsBtn').classList.toggle('active',tab==='jobs');
-  el('tabCashBtn').classList.toggle('active',tab==='cash');
-  el('tabSettingsBtn').classList.toggle('active',tab==='settings');
+el('homePage').classList.toggle('hidden',tab!=='home');
+el('jobEntryPage').classList.toggle('hidden',tab!=='jobEntry');
+el('cashPage').classList.toggle('hidden',tab!=='cash');
+el('settingsPage').classList.toggle('hidden',tab!=='settings');
 
-  if(tab==='settings') renderSettings();
-  if(tab==='cash') renderCashPage();
+el('tabHomeBtn').classList.toggle('active',tab==='home');
+el('tabJobsBtn').classList.toggle('active',tab==='jobEntry');
+el('tabCashBtn').classList.toggle('active',tab==='cash');
+el('tabSettingsBtn').classList.toggle('active',tab==='settings');
+
+if(tab==='settings') renderSettings();
+if(tab==='cash') renderCashPage();
+if(tab==='jobEntry') renderJobEntryCards();
+window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function applySettings(){
-  el('appTitle').textContent=settings.title;
-  el('appSubtitle').textContent=settings.subtitle;
+el('appTitle').textContent=settings.title;
+el('appSubtitle').textContent=settings.subtitle;
 
-  fillSelect('source',settings.sources,'İş kaynağı seç');
-  fillSelect('cashSource',settings.sources,'İş kaynağı seç');
-  fillSelect('serviceType',settings.serviceTypes);
-  fillSelect('status',settings.statuses);
-  fillSelect('paymentType',settings.paymentTypes);
-  fillSelect('cashPaymentType',settings.paymentTypes);
+fillSelect('source',settings.sources,'İş kaynağı seç');
+fillSelect('cashSource',settings.sources,'İş kaynağı seç');
+fillSelect('serviceType',settings.serviceTypes);
+fillSelect('status',settings.statuses);
+fillSelect('paymentType',settings.paymentTypes);
+fillSelect('cashPaymentType',settings.paymentTypes);
 
-  fillSelect('fSource',['',...settings.sources],'Tüm kaynaklar');
-  fillSelect('fStatus',['',...settings.statuses],'Tüm durumlar');
-  fillSelect('fService',['',...settings.serviceTypes],'Tüm işler');
+fillSelect('fSource',['',...settings.sources],'Tüm kaynaklar');
+fillSelect('fStatus',['',...settings.statuses],'Tüm durumlar');
+fillSelect('fService',['',...settings.serviceTypes],'Tüm işler');
 
-  fillSelect('cfSource',['',...settings.sources],'Tüm kaynaklar');
-  fillSelect('cfPayment',['',...settings.paymentTypes],'Tüm ödeme şekilleri');
+fillSelect('cfSource',['',...settings.sources],'Tüm kaynaklar');
+fillSelect('cfPayment',['',...settings.paymentTypes],'Tüm ödeme şekilleri');
 
-  el('setTitle').value=settings.title;
-  el('setSubtitle').value=settings.subtitle;
-  el('setDefaultRate').value=settings.defaultRate;
+el('setTitle').value=settings.title;
+el('setSubtitle').value=settings.subtitle;
+el('setDefaultRate').value=settings.defaultRate;
 }
 
 function fillSelect(id,items,emptyText){
-  const select=el(id);
-  const current=select.value;
-  select.innerHTML='';
-  items.forEach(item=>{
-    const opt=document.createElement('option');
-    opt.value=item;
-    opt.textContent=item==='' ? emptyText : item;
-    select.appendChild(opt);
-  });
-  if(items.includes(current)) select.value=current;
+const select=el(id);
+const current=select.value;
+select.innerHTML='';
+items.forEach(item=>{
+const opt=document.createElement('option');
+opt.value=item;
+opt.textContent=item===''?emptyText:item;
+select.appendChild(opt);
+});
+if(items.includes(current)) select.value=current;
 }
 
 function saveGeneralSettings(){
-  settings.title=val('setTitle')||defaultSettings.title;
-  settings.subtitle=val('setSubtitle')||defaultSettings.subtitle;
-  settings.defaultRate=Number(val('setDefaultRate')||50);
-  if(settings.defaultRate<0) settings.defaultRate=0;
-  if(settings.defaultRate>100) settings.defaultRate=100;
-
-  saveSettings();
-  applySettings();
-  render();
-  renderCashPage();
-  alert('Genel ayarlar kaydedildi.');
+settings.title=val('setTitle')||defaultSettings.title;
+settings.subtitle=val('setSubtitle')||defaultSettings.subtitle;
+settings.defaultRate=Number(val('setDefaultRate')||50);
+if(settings.defaultRate<0)settings.defaultRate=0;
+if(settings.defaultRate>100)settings.defaultRate=100;
+saveSettings();applySettings();render();renderCashPage();
+alert('Genel ayarlar kaydedildi.');
 }
 
 function addSettingItem(type,inputId){
-  const value=val(inputId);
-  if(!value){alert('Boş kayıt eklenemez.');return}
-  if(settings[type].includes(value)){alert('Bu kayıt zaten var.');return}
-
-  settings[type].push(value);
-  el(inputId).value='';
-  saveSettings();
-  applySettings();
-  renderSettings();
-  render();
-  renderCashPage();
+const value=val(inputId);
+if(!value){alert('Boş kayıt eklenemez.');return}
+if(settings[type].includes(value)){alert('Bu kayıt zaten var.');return}
+settings[type].push(value);
+el(inputId).value='';
+saveSettings();applySettings();renderSettings();render();renderCashPage();
 }
 
 function editSettingItem(type,index){
-  const oldValue=settings[type][index];
-  const newValue=prompt('Yeni isim:',oldValue);
-  if(!newValue || !newValue.trim()) return;
+const oldValue=settings[type][index];
+const newValue=prompt('Yeni isim:',oldValue);
+if(!newValue||!newValue.trim())return;
+const clean=newValue.trim();
+if(settings[type].includes(clean)&&clean!==oldValue){alert('Bu isim zaten var.');return}
+settings[type][index]=clean;
 
-  const clean=newValue.trim();
+if(type==='sources'){
+jobs.forEach(j=>{if(j.source===oldValue)j.source=clean});
+cashMoves.forEach(c=>{if(c.source===oldValue)c.source=clean});
+}
+if(type==='serviceTypes')jobs.forEach(j=>{if(j.serviceType===oldValue)j.serviceType=clean});
+if(type==='statuses')jobs.forEach(j=>{if(j.status===oldValue)j.status=clean});
+if(type==='paymentTypes'){
+jobs.forEach(j=>{if(j.paymentType===oldValue)j.paymentType=clean});
+cashMoves.forEach(c=>{if(c.paymentType===oldValue)c.paymentType=clean});
+}
 
-  if(settings[type].includes(clean) && clean!==oldValue){
-    alert('Bu isim zaten var.');
-    return;
-  }
-
-  settings[type][index]=clean;
-
-  if(type==='sources'){
-    jobs.forEach(j=>{if(j.source===oldValue) j.source=clean});
-    cashMoves.forEach(c=>{if(c.source===oldValue) c.source=clean});
-  }
-  if(type==='serviceTypes') jobs.forEach(j=>{if(j.serviceType===oldValue) j.serviceType=clean});
-  if(type==='statuses') jobs.forEach(j=>{if(j.status===oldValue) j.status=clean});
-  if(type==='paymentTypes'){
-    jobs.forEach(j=>{if(j.paymentType===oldValue) j.paymentType=clean});
-    cashMoves.forEach(c=>{if(c.paymentType===oldValue) c.paymentType=clean});
-  }
-
-  saveJobs();
-  saveCash();
-  saveSettings();
-  applySettings();
-  renderSettings();
-  render();
-  renderCashPage();
+saveJobs();saveCash();saveSettings();applySettings();renderSettings();render();renderCashPage();
 }
 
 function deleteSettingItem(type,index){
-  const value=settings[type][index];
-
-  if(settings[type].length<=1){
-    alert('En az 1 kayıt kalmalı.');
-    return;
-  }
-
-  if(!confirm(value + ' silinsin mi? Eski kayıtlardan silinmez; sadece seçim listesinden kalkar.')) return;
-
-  settings[type].splice(index,1);
-  saveSettings();
-  applySettings();
-  renderSettings();
-  render();
-  renderCashPage();
+const value=settings[type][index];
+if(settings[type].length<=1){alert('En az 1 kayıt kalmalı.');return}
+if(!confirm(value+' silinsin mi? Eski kayıtlardan silinmez; sadece seçim listesinden kalkar.'))return;
+settings[type].splice(index,1);
+saveSettings();applySettings();renderSettings();render();renderCashPage();
 }
 
 function renderSettings(){
-  renderSettingList('sourceSettingsList','sources');
-  renderSettingList('serviceTypeSettingsList','serviceTypes');
-  renderSettingList('statusSettingsList','statuses');
-  renderSettingList('paymentTypeSettingsList','paymentTypes');
-
-  el('setTitle').value=settings.title;
-  el('setSubtitle').value=settings.subtitle;
-  el('setDefaultRate').value=settings.defaultRate;
+renderSettingList('sourceSettingsList','sources');
+renderSettingList('serviceTypeSettingsList','serviceTypes');
+renderSettingList('statusSettingsList','statuses');
+renderSettingList('paymentTypeSettingsList','paymentTypes');
+el('setTitle').value=settings.title;
+el('setSubtitle').value=settings.subtitle;
+el('setDefaultRate').value=settings.defaultRate;
 }
 
 function renderSettingList(listId,type){
-  el(listId).innerHTML=settings[type].map((item,index)=>`
-    <div class="setting-item">
-      <span>${esc(item)}</span>
-      <button class="light" onclick="editSettingItem('${type}',${index})">Düzenle</button>
-      <button class="red" onclick="deleteSettingItem('${type}',${index})">Sil</button>
-    </div>
-  `).join('');
+el(listId).innerHTML=settings[type].map((item,index)=>`
+<div class="setting-item">
+<span>${esc(item)}</span>
+<button class="light" onclick="editSettingItem('${type}',${index})">Düzenle</button>
+<button class="red" onclick="deleteSettingItem('${type}',${index})">Sil</button>
+</div>`).join('');
 }
 
 function resetSettings(){
-  if(!confirm('Ayarlar varsayılana dönecek. İş ve kasa kayıtların silinmez. Emin misin?')) return;
-
-  settings={...defaultSettings};
-  saveSettings();
-  applySettings();
-  renderSettings();
-  render();
-  renderCashPage();
+if(!confirm('Ayarlar varsayılana dönecek. İş ve kasa kayıtların silinmez. Emin misin?'))return;
+settings={...defaultSettings};
+saveSettings();applySettings();renderSettings();render();renderCashPage();
 }
 
 function calc(j){
-  const collection=Number(j.collection||0);
-  const material=Number(j.material||0);
-  const rate=Number(j.sourceRate||settings.defaultRate||50);
-  const net=Math.max(collection-material,0);
-  const sourceShare=net*rate/100;
-  const myShare=net-sourceShare;
-
-  return {collection,material,rate,net,sourceShare,myShare};
+const collection=Number(j.collection||0);
+const material=Number(j.material||0);
+const rate=Number(j.sourceRate||settings.defaultRate||50);
+const net=Math.max(collection-material,0);
+const sourceShare=net*rate/100;
+const myShare=net-sourceShare;
+return{collection,material,rate,net,sourceShare,myShare};
 }
 
 function saveJob(){
-  if(!val('date')||!val('source')){
-    alert('Tarih ve iş kaynağı zorunlu.');
-    return;
-  }
+if(!val('date')||!val('source')){alert('Tarih ve iş kaynağı zorunlu.');return}
+const collection=parseFloat(val('collection')||0);
+const material=parseFloat(val('material')||0);
+if(collection<0||material<0){alert('Tutarlar eksi olamaz.');return}
 
-  const collection=parseFloat(val('collection')||0);
-  const material=parseFloat(val('material')||0);
+const item={
+id:val('editId')||crypto.randomUUID(),
+date:val('date'),
+source:val('source'),
+serviceType:val('serviceType'),
+device:val('device'),
+customerInfo:val('customerInfo'),
+jobNote:val('jobNote'),
+collection,
+material,
+sourceRate:Number(val('sourceRate')||settings.defaultRate||50),
+status:val('status'),
+paymentType:val('paymentType'),
+createdAt:new Date().toISOString()
+};
 
-  if(collection<0||material<0){
-    alert('Tutarlar eksi olamaz.');
-    return;
-  }
-
-  const item={
-    id:val('editId')||crypto.randomUUID(),
-    date:val('date'),
-    source:val('source'),
-    serviceType:val('serviceType'),
-    device:val('device'),
-    customerInfo:val('customerInfo'),
-    jobNote:val('jobNote'),
-    collection,
-    material,
-    sourceRate:Number(val('sourceRate')||settings.defaultRate||50),
-    status:val('status'),
-    paymentType:val('paymentType'),
-    createdAt:new Date().toISOString()
-  };
-
-  const i=jobs.findIndex(x=>x.id===item.id);
-
-  if(i>-1) jobs[i]=item;
-  else jobs.unshift(item);
-
-  saveJobs();
-  clearForm();
-  render();
+const i=jobs.findIndex(x=>x.id===item.id);
+if(i>-1)jobs[i]=item;else jobs.unshift(item);
+saveJobs();clearForm();render();renderJobEntryCards();showTab('home');
 }
 
 function clearForm(){
-  ['editId','device','customerInfo','jobNote','collection','material'].forEach(id=>el(id).value='');
-
-  el('date').value=today();
-  el('source').value=settings.sources[0]||'';
-  el('serviceType').value=settings.serviceTypes[0]||'';
-  el('sourceRate').value=settings.defaultRate||50;
-  el('status').value=settings.statuses[0]||'';
-  el('paymentType').value=settings.paymentTypes[0]||'';
+['editId','device','customerInfo','jobNote','collection','material'].forEach(id=>el(id).value='');
+el('date').value=today();
+el('source').value=settings.sources[0]||'';
+el('serviceType').value=settings.serviceTypes[0]||'';
+el('sourceRate').value=settings.defaultRate||50;
+el('status').value=settings.statuses[0]||'';
+el('paymentType').value=settings.paymentTypes[0]||'';
 }
 
 function filteredJobs(){
-  const s=val('fStart');
-  const e=val('fEnd');
-  const src=val('fSource');
-  const st=val('fStatus');
-  const srv=val('fService');
-  const q=val('fSearch').toLowerCase();
-
-  return jobs.filter(x=>
-    (!s||x.date>=s)&&
-    (!e||x.date<=e)&&
-    (!src||x.source===src)&&
-    (!st||x.status===st)&&
-    (!srv||x.serviceType===srv)&&
-    (!q||[x.customerInfo,x.device,x.jobNote,x.source,x.serviceType].join(' ').toLowerCase().includes(q))
-  ).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+const s=val('fStart'),e=val('fEnd'),src=val('fSource'),st=val('fStatus'),srv=val('fService'),q=val('fSearch').toLowerCase();
+return jobs.filter(x=>
+(!s||x.date>=s)&&(!e||x.date<=e)&&(!src||x.source===src)&&(!st||x.status===st)&&(!srv||x.serviceType===srv)&&
+(!q||[x.customerInfo,x.device,x.jobNote,x.source,x.serviceType].join(' ').toLowerCase().includes(q))
+).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
 }
 
 function filteredCashForReport(){
-  const s=val('fStart');
-  const e=val('fEnd');
-  const src=val('fSource');
-  const q=val('fSearch').toLowerCase();
-
-  return cashMoves.filter(x=>
-    (!s||x.date>=s)&&
-    (!e||x.date<=e)&&
-    (!src||x.source===src)&&
-    (!q||[x.source,x.note,x.category,x.paymentType].join(' ').toLowerCase().includes(q))
-  ).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+const s=val('fStart'),e=val('fEnd'),src=val('fSource'),q=val('fSearch').toLowerCase();
+return cashMoves.filter(x=>
+(!s||x.date>=s)&&(!e||x.date<=e)&&(!src||x.source===src)&&
+(!q||[x.source,x.note,x.category,x.paymentType].join(' ').toLowerCase().includes(q))
+).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
 }
 
 function statusClass(s){
-  if(s==='Hesaplaşıldı') return 'done';
-  if(s==='Ödendi' || s==='Kaynağa Ödendi') return 'paid';
-  if(s==='İptal') return 'cancel';
-  return 'pending';
+if(s==='Hesaplaşıldı')return'done';
+if(s==='Ödendi'||s==='Kaynağa Ödendi')return'paid';
+if(s==='İptal')return'cancel';
+return'pending';
 }
 
 function render(){
-  const rows=filteredJobs();
-  const cashRows=filteredCashForReport();
+const rows=filteredJobs();
+const cashRows=filteredCashForReport();
+const tb=el('tbody'),mobile=el('mobileCards'),cashReportTb=el('cashInReportTbody'),cashReportMobile=el('cashReportMobileCards');
+tb.innerHTML='';mobile.innerHTML='';cashReportTb.innerHTML='';cashReportMobile.innerHTML='';
 
-  const tb=el('tbody');
-  const mobile=el('mobileCards');
-  const cashReportTb=el('cashInReportTbody');
-  const cashReportMobile=el('cashReportMobileCards');
+let sourceShareTotal=0,myTotal=0,cashIn=0,cashOut=0;
 
-  tb.innerHTML='';
-  mobile.innerHTML='';
-  cashReportTb.innerHTML='';
-  cashReportMobile.innerHTML='';
+rows.forEach(x=>{
+const c=calc(x);
+sourceShareTotal+=c.sourceShare;
+myTotal+=c.myShare;
 
-  let sourceShareTotal=0;
-  let myTotal=0;
-  let cashIn=0;
-  let cashOut=0;
+const tr=document.createElement('tr');
+tr.innerHTML=`
+<td>${esc(x.date)}<br><span class="muted">${esc(x.paymentType||'')}</span></td>
+<td><b>${esc(x.source)}</b><br><span class="muted">%${c.rate}</span></td>
+<td>${esc(x.customerInfo)||'-'}</td>
+<td><b>${esc(x.serviceType)}</b><br>${esc(x.device)||''}<br><span class="muted">${esc(x.jobNote)||''}</span></td>
+<td class="right ok">${fmt(c.collection)}</td>
+<td class="right danger">${fmt(c.material)}</td>
+<td class="right warn"><b>${fmt(c.sourceShare)}</b></td>
+<td class="right ok"><b>${fmt(c.myShare)}</b></td>
+<td><span class="pill ${statusClass(x.status)}">${esc(x.status)}</span></td>
+<td class="no-print"><button class="light" onclick="editJob('${x.id}')">Düzenle</button><button class="red" onclick="delJob('${x.id}')">Sil</button></td>`;
+tb.appendChild(tr);
 
-  rows.forEach(x=>{
-    const c=calc(x);
+mobile.appendChild(jobCard(x,c));
+});
 
-    sourceShareTotal+=c.sourceShare;
-    myTotal+=c.myShare;
+cashRows.forEach(x=>{
+if(x.type==='in')cashIn+=Number(x.amount||0);
+if(x.type==='out')cashOut+=Number(x.amount||0);
 
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${esc(x.date)}<br><span class="muted">${esc(x.paymentType||'')}</span></td>
-      <td><b>${esc(x.source)}</b><br><span class="muted">%${c.rate}</span></td>
-      <td>${esc(x.customerInfo)||'-'}</td>
-      <td><b>${esc(x.serviceType)}</b><br>${esc(x.device)||''}<br><span class="muted">${esc(x.jobNote)||''}</span></td>
-      <td class="right ok">${fmt(c.collection)}</td>
-      <td class="right danger">${fmt(c.material)}</td>
-      <td class="right warn"><b>${fmt(c.sourceShare)}</b></td>
-      <td class="right ok"><b>${fmt(c.myShare)}</b></td>
-      <td><span class="pill ${statusClass(x.status)}">${esc(x.status)}</span></td>
-      <td class="no-print">
-        <button class="light" onclick="editJob('${x.id}')">Düzenle</button>
-        <button class="red" onclick="delJob('${x.id}')">Sil</button>
-      </td>
-    `;
-    tb.appendChild(tr);
+const cls=x.type==='in'?'cashin':'cashout';
+const typeText=x.type==='in'?'Para Girişi':'Ekstra Gider';
 
-    const card=document.createElement('div');
-    card.className='job-card';
-    card.innerHTML=`
-      <div class="job-card-top">
-        <div>
-          <h3>${esc(x.source)}</h3>
-          <p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p>
-        </div>
-        <span class="pill ${statusClass(x.status)}">${esc(x.status)}</span>
-      </div>
+const tr=document.createElement('tr');
+tr.innerHTML=`
+<td>${esc(x.date)}</td>
+<td><b>${esc(x.source)}</b></td>
+<td><span class="pill ${cls}">${typeText}</span></td>
+<td>${esc(x.note)||'-'}<br><span class="muted">${esc(x.category)||''}</span></td>
+<td>${esc(x.paymentType)||''}</td>
+<td class="right ${x.type==='in'?'ok':'danger'}"><b>${fmt(x.amount)}</b></td>`;
+cashReportTb.appendChild(tr);
 
-      <p><b>Müşteri / Adres:</b> ${esc(x.customerInfo)||'-'}</p>
-      <p><b>İş:</b> ${esc(x.serviceType)} - ${esc(x.device)||'-'}</p>
-      <p><b>Açıklama:</b> ${esc(x.jobNote)||'-'}</p>
+const card=document.createElement('div');
+card.className='job-card';
+card.innerHTML=`
+<div class="job-card-top"><div><h3>${esc(x.source)}</h3><p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p></div><span class="pill ${cls}">${typeText}</span></div>
+<p><b>Kategori:</b> ${esc(x.category)||'-'}</p>
+<p><b>Açıklama:</b> ${esc(x.note)||'-'}</p>
+<div class="money-grid"><div><small>Tutar</small><b class="${x.type==='in'?'ok':'danger'}">${fmt(x.amount)}</b></div></div>`;
+cashReportMobile.appendChild(card);
+});
 
-      <div class="money-grid">
-        <div><small>Tahsilat</small><b class="ok">${fmt(c.collection)}</b></div>
-        <div><small>Malzeme</small><b class="danger">${fmt(c.material)}</b></div>
-        <div><small>Hakediş</small><b class="warn">${fmt(c.sourceShare)}</b></div>
-        <div><small>Sana Kalan</small><b class="ok">${fmt(c.myShare)}</b></div>
-      </div>
+const balance=sourceShareTotal+cashIn-cashOut;
+el('sumSource').textContent=fmt(sourceShareTotal);
+el('sumCashIn').textContent=fmt(cashIn);
+el('sumCashOut').textContent=fmt(cashOut);
+el('sumBalance').textContent=fmt(balance);
+el('sumMine').textContent=fmt(myTotal);
+el('countText').textContent=`${rows.length} iş kaydı, ${cashRows.length} kasa hareketi listeleniyor.`;
 
-      <div class="btns no-print">
-        <button class="light" onclick="editJob('${x.id}')">Düzenle</button>
-        <button class="red" onclick="delJob('${x.id}')">Sil</button>
-      </div>
-    `;
-    mobile.appendChild(card);
-  });
+updateStats();
+updatePrintTitle();
+renderJobEntryCards();
+}
 
-  cashRows.forEach(x=>{
-    if(x.type==='in') cashIn+=Number(x.amount||0);
-    if(x.type==='out') cashOut+=Number(x.amount||0);
+function jobCard(x,c){
+const card=document.createElement('div');
+card.className='job-card';
+card.innerHTML=`
+<div class="job-card-top">
+<div><h3>${esc(x.source)}</h3><p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p></div>
+<span class="pill ${statusClass(x.status)}">${esc(x.status)}</span>
+</div>
+<p><b>Müşteri / Adres:</b> ${esc(x.customerInfo)||'-'}</p>
+<p><b>İş:</b> ${esc(x.serviceType)} - ${esc(x.device)||'-'}</p>
+<p><b>Açıklama:</b> ${esc(x.jobNote)||'-'}</p>
+<div class="money-grid">
+<div><small>Tahsilat</small><b class="ok">${fmt(c.collection)}</b></div>
+<div><small>Malzeme</small><b class="danger">${fmt(c.material)}</b></div>
+<div><small>Hakediş</small><b class="warn">${fmt(c.sourceShare)}</b></div>
+<div><small>Sana Kalan</small><b class="ok">${fmt(c.myShare)}</b></div>
+</div>
+<div class="btns no-print">
+<button class="light" onclick="editJob('${x.id}')">Düzenle</button>
+<button class="red" onclick="delJob('${x.id}')">Sil</button>
+</div>`;
+return card;
+}
 
-    const cls=x.type==='in'?'cashin':'cashout';
-    const typeText=x.type==='in'?'Para Girişi':'Ekstra Gider';
-
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${esc(x.date)}</td>
-      <td><b>${esc(x.source)}</b></td>
-      <td><span class="pill ${cls}">${typeText}</span></td>
-      <td>${esc(x.note)||'-'}<br><span class="muted">${esc(x.category)||''}</span></td>
-      <td>${esc(x.paymentType)||''}</td>
-      <td class="right ${x.type==='in'?'ok':'danger'}"><b>${fmt(x.amount)}</b></td>
-    `;
-    cashReportTb.appendChild(tr);
-
-    const card=document.createElement('div');
-    card.className='job-card';
-    card.innerHTML=`
-      <div class="job-card-top">
-        <div>
-          <h3>${esc(x.source)}</h3>
-          <p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p>
-        </div>
-        <span class="pill ${cls}">${typeText}</span>
-      </div>
-      <p><b>Kategori:</b> ${esc(x.category)||'-'}</p>
-      <p><b>Açıklama:</b> ${esc(x.note)||'-'}</p>
-      <div class="money-grid">
-        <div><small>Tutar</small><b class="${x.type==='in'?'ok':'danger'}">${fmt(x.amount)}</b></div>
-      </div>
-    `;
-    cashReportMobile.appendChild(card);
-  });
-
-  const balance=sourceShareTotal+cashIn-cashOut;
-
-  el('sumSource').textContent=fmt(sourceShareTotal);
-  el('sumCashIn').textContent=fmt(cashIn);
-  el('sumCashOut').textContent=fmt(cashOut);
-  el('sumBalance').textContent=fmt(balance);
-  el('sumMine').textContent=fmt(myTotal);
-  el('countText').textContent=`${rows.length} iş kaydı, ${cashRows.length} kasa hareketi listeleniyor.`;
-
-  updateStats();
-  updatePrintTitle();
+function renderJobEntryCards(){
+const box=el('jobEntryCards');
+if(!box)return;
+box.innerHTML='';
+jobs.slice(0,8).forEach(x=>box.appendChild(jobCard(x,calc(x))));
 }
 
 function updateStats(){
-  let tc=0;
-  let tm=0;
-  let hak=0;
-  let cashIn=0;
-  let cashOut=0;
-
-  jobs.filter(x=>x.status!=='İptal').forEach(x=>{
-    const c=calc(x);
-    tc+=c.collection;
-    tm+=c.material;
-    hak+=c.sourceShare;
-  });
-
-  cashMoves.forEach(x=>{
-    if(x.type==='in') cashIn+=Number(x.amount||0);
-    if(x.type==='out') cashOut+=Number(x.amount||0);
-  });
-
-  const ekstraGider=cashOut-cashIn;
-  const balance=hak+cashIn-cashOut;
-
-  el('totalCollection').textContent=fmt(tc);
-  el('totalMaterial').textContent=fmt(tm);
-  el('totalSourceShare').textContent=fmt(hak);
-  el('totalCashNet').textContent=fmt(ekstraGider);
-  el('totalCashNet').className=ekstraGider>=0?'danger':'ok';
-  el('totalBalance').textContent=fmt(balance);
+let tc=0,tm=0,hak=0,cashIn=0,cashOut=0;
+jobs.filter(x=>x.status!=='İptal').forEach(x=>{
+const c=calc(x);
+tc+=c.collection;tm+=c.material;hak+=c.sourceShare;
+});
+cashMoves.forEach(x=>{
+if(x.type==='in')cashIn+=Number(x.amount||0);
+if(x.type==='out')cashOut+=Number(x.amount||0);
+});
+const ekstraGider=cashOut-cashIn;
+const balance=hak+cashIn-cashOut;
+el('totalCollection').textContent=fmt(tc);
+el('totalMaterial').textContent=fmt(tm);
+el('totalSourceShare').textContent=fmt(hak);
+el('totalCashNet').textContent=fmt(ekstraGider);
+el('totalCashNet').className=ekstraGider>=0?'danger':'ok';
+el('totalBalance').textContent=fmt(balance);
 }
 
 function editJob(id){
-  const x=jobs.find(j=>j.id===id);
-  if(!x) return;
-
-  el('editId').value=x.id;
-  el('date').value=x.date;
-  el('source').value=x.source;
-  el('serviceType').value=x.serviceType;
-  el('device').value=x.device||'';
-  el('customerInfo').value=x.customerInfo || [x.customer,x.phone,x.address].filter(Boolean).join(' - ');
-  el('jobNote').value=x.jobNote||'';
-  el('collection').value=x.collection||'';
-  el('material').value=x.material||'';
-  el('sourceRate').value=x.sourceRate||settings.defaultRate||50;
-  el('status').value=x.status;
-  el('paymentType').value=x.paymentType;
-
-  showTab('jobs');
-  window.scrollTo({top:0,behavior:'smooth'});
+const x=jobs.find(j=>j.id===id);
+if(!x)return;
+el('editId').value=x.id;
+el('date').value=x.date;
+el('source').value=x.source;
+el('serviceType').value=x.serviceType;
+el('device').value=x.device||'';
+el('customerInfo').value=x.customerInfo||[x.customer,x.phone,x.address].filter(Boolean).join(' - ');
+el('jobNote').value=x.jobNote||'';
+el('collection').value=x.collection||'';
+el('material').value=x.material||'';
+el('sourceRate').value=x.sourceRate||settings.defaultRate||50;
+el('status').value=x.status;
+el('paymentType').value=x.paymentType;
+showTab('jobEntry');
 }
 
 function delJob(id){
-  if(confirm('Bu iş kaydını silmek istiyor musun?')){
-    jobs=jobs.filter(x=>x.id!==id);
-    saveJobs();
-    render();
-  }
+if(confirm('Bu iş kaydını silmek istiyor musun?')){
+jobs=jobs.filter(x=>x.id!==id);
+saveJobs();render();
+}
 }
 
 function saveCashMove(){
-  if(!val('cashDate')||!val('cashSource')){
-    alert('Tarih ve iş kaynağı zorunlu.');
-    return;
-  }
+if(!val('cashDate')||!val('cashSource')){alert('Tarih ve iş kaynağı zorunlu.');return}
+const amount=parseFloat(val('cashAmount')||0);
+if(!amount||amount<=0){alert('Tutar sıfırdan büyük olmalı.');return}
 
-  const amount=parseFloat(val('cashAmount')||0);
+const item={
+id:val('cashEditId')||crypto.randomUUID(),
+date:val('cashDate'),
+source:val('cashSource'),
+type:val('cashType'),
+amount,
+paymentType:val('cashPaymentType'),
+category:val('cashCategory'),
+note:val('cashNote'),
+createdAt:new Date().toISOString()
+};
 
-  if(!amount||amount<=0){
-    alert('Tutar sıfırdan büyük olmalı.');
-    return;
-  }
-
-  const item={
-    id:val('cashEditId')||crypto.randomUUID(),
-    date:val('cashDate'),
-    source:val('cashSource'),
-    type:val('cashType'),
-    amount,
-    paymentType:val('cashPaymentType'),
-    category:val('cashCategory'),
-    note:val('cashNote'),
-    createdAt:new Date().toISOString()
-  };
-
-  const i=cashMoves.findIndex(x=>x.id===item.id);
-
-  if(i>-1) cashMoves[i]=item;
-  else cashMoves.unshift(item);
-
-  saveCash();
-  clearCashForm();
-  renderCashPage();
-  render();
+const i=cashMoves.findIndex(x=>x.id===item.id);
+if(i>-1)cashMoves[i]=item;else cashMoves.unshift(item);
+saveCash();clearCashForm();renderCashPage();render();showTab('home');
 }
 
 function clearCashForm(){
-  ['cashEditId','cashAmount','cashCategory','cashNote'].forEach(id=>el(id).value='');
-
-  el('cashDate').value=today();
-  el('cashSource').value=settings.sources[0]||'';
-  el('cashType').value='in';
-  el('cashPaymentType').value=settings.paymentTypes[0]||'';
+['cashEditId','cashAmount','cashCategory','cashNote'].forEach(id=>el(id).value='');
+el('cashDate').value=today();
+el('cashSource').value=settings.sources[0]||'';
+el('cashType').value='in';
+el('cashPaymentType').value=settings.paymentTypes[0]||'';
 }
 
 function filteredCashPage(){
-  const s=val('cfStart');
-  const e=val('cfEnd');
-  const src=val('cfSource');
-  const type=val('cfType');
-  const pay=val('cfPayment');
-  const q=val('cfSearch').toLowerCase();
-
-  return cashMoves.filter(x=>
-    (!s||x.date>=s)&&
-    (!e||x.date<=e)&&
-    (!src||x.source===src)&&
-    (!type||x.type===type)&&
-    (!pay||x.paymentType===pay)&&
-    (!q||[x.source,x.note,x.category,x.paymentType].join(' ').toLowerCase().includes(q))
-  ).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
+const s=val('cfStart'),e=val('cfEnd'),src=val('cfSource'),type=val('cfType'),pay=val('cfPayment'),q=val('cfSearch').toLowerCase();
+return cashMoves.filter(x=>
+(!s||x.date>=s)&&(!e||x.date<=e)&&(!src||x.source===src)&&(!type||x.type===type)&&(!pay||x.paymentType===pay)&&
+(!q||[x.source,x.note,x.category,x.paymentType].join(' ').toLowerCase().includes(q))
+).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt));
 }
 
 function renderCashPage(){
-  const rows=filteredCashPage();
+const rows=filteredCashPage();
+const tb=el('cashTbody'),mobile=el('cashMobileCards');
+tb.innerHTML='';mobile.innerHTML='';
+let cashIn=0,cashOut=0;
 
-  const tb=el('cashTbody');
-  const mobile=el('cashMobileCards');
+rows.forEach(x=>{
+if(x.type==='in')cashIn+=Number(x.amount||0);
+if(x.type==='out')cashOut+=Number(x.amount||0);
+const cls=x.type==='in'?'cashin':'cashout';
+const typeText=x.type==='in'?'Para Girişi':'Ekstra Gider';
 
-  tb.innerHTML='';
-  mobile.innerHTML='';
+const tr=document.createElement('tr');
+tr.innerHTML=`
+<td>${esc(x.date)}</td><td><b>${esc(x.source)}</b></td><td><span class="pill ${cls}">${typeText}</span></td>
+<td>${esc(x.category)||'-'}</td><td>${esc(x.note)||'-'}</td><td>${esc(x.paymentType)||''}</td>
+<td class="right ${x.type==='in'?'ok':'danger'}"><b>${fmt(x.amount)}</b></td>
+<td class="no-print"><button class="light" onclick="editCashMove('${x.id}')">Düzenle</button><button class="red" onclick="delCashMove('${x.id}')">Sil</button></td>`;
+tb.appendChild(tr);
 
-  let cashIn=0;
-  let cashOut=0;
+const card=document.createElement('div');
+card.className='job-card';
+card.innerHTML=`
+<div class="job-card-top"><div><h3>${esc(x.source)}</h3><p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p></div><span class="pill ${cls}">${typeText}</span></div>
+<p><b>Kategori:</b> ${esc(x.category)||'-'}</p>
+<p><b>Açıklama:</b> ${esc(x.note)||'-'}</p>
+<div class="money-grid"><div><small>Tutar</small><b class="${x.type==='in'?'ok':'danger'}">${fmt(x.amount)}</b></div></div>
+<div class="btns no-print"><button class="light" onclick="editCashMove('${x.id}')">Düzenle</button><button class="red" onclick="delCashMove('${x.id}')">Sil</button></div>`;
+mobile.appendChild(card);
+});
 
-  rows.forEach(x=>{
-    if(x.type==='in') cashIn+=Number(x.amount||0);
-    if(x.type==='out') cashOut+=Number(x.amount||0);
-
-    const cls=x.type==='in'?'cashin':'cashout';
-    const typeText=x.type==='in'?'Para Girişi':'Ekstra Gider';
-
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${esc(x.date)}</td>
-      <td><b>${esc(x.source)}</b></td>
-      <td><span class="pill ${cls}">${typeText}</span></td>
-      <td>${esc(x.category)||'-'}</td>
-      <td>${esc(x.note)||'-'}</td>
-      <td>${esc(x.paymentType)||''}</td>
-      <td class="right ${x.type==='in'?'ok':'danger'}"><b>${fmt(x.amount)}</b></td>
-      <td class="no-print">
-        <button class="light" onclick="editCashMove('${x.id}')">Düzenle</button>
-        <button class="red" onclick="delCashMove('${x.id}')">Sil</button>
-      </td>
-    `;
-    tb.appendChild(tr);
-
-    const card=document.createElement('div');
-    card.className='job-card';
-    card.innerHTML=`
-      <div class="job-card-top">
-        <div>
-          <h3>${esc(x.source)}</h3>
-          <p><b>${esc(x.date)}</b> - ${esc(x.paymentType||'')}</p>
-        </div>
-        <span class="pill ${cls}">${typeText}</span>
-      </div>
-      <p><b>Kategori:</b> ${esc(x.category)||'-'}</p>
-      <p><b>Açıklama:</b> ${esc(x.note)||'-'}</p>
-      <div class="money-grid">
-        <div><small>Tutar</small><b class="${x.type==='in'?'ok':'danger'}">${fmt(x.amount)}</b></div>
-      </div>
-      <div class="btns no-print">
-        <button class="light" onclick="editCashMove('${x.id}')">Düzenle</button>
-        <button class="red" onclick="delCashMove('${x.id}')">Sil</button>
-      </div>
-    `;
-    mobile.appendChild(card);
-  });
-
-  const net=cashIn-cashOut;
-
-  el('cashPageIn').textContent=fmt(cashIn);
-  el('cashPageOut').textContent=fmt(cashOut);
-  el('cashPageNet').textContent=fmt(net);
-  el('cashPageNet').className=net>=0?'ok':'danger';
-  el('cashPageCount').textContent=rows.length;
-  el('cashPageSource').textContent=val('cfSource')||'Tümü';
+const net=cashIn-cashOut;
+el('cashPageIn').textContent=fmt(cashIn);
+el('cashPageOut').textContent=fmt(cashOut);
+el('cashPageNet').textContent=fmt(net);
+el('cashPageNet').className=net>=0?'ok':'danger';
+el('cashPageCount').textContent=rows.length;
+el('cashPageSource').textContent=val('cfSource')||'Tümü';
 }
 
 function editCashMove(id){
-  const x=cashMoves.find(c=>c.id===id);
-  if(!x) return;
-
-  el('cashEditId').value=x.id;
-  el('cashDate').value=x.date;
-  el('cashSource').value=x.source;
-  el('cashType').value=x.type;
-  el('cashAmount').value=x.amount;
-  el('cashPaymentType').value=x.paymentType;
-  el('cashCategory').value=x.category||'';
-  el('cashNote').value=x.note||'';
-
-  showTab('cash');
-  window.scrollTo({top:0,behavior:'smooth'});
+const x=cashMoves.find(c=>c.id===id);
+if(!x)return;
+el('cashEditId').value=x.id;
+el('cashDate').value=x.date;
+el('cashSource').value=x.source;
+el('cashType').value=x.type;
+el('cashAmount').value=x.amount;
+el('cashPaymentType').value=x.paymentType;
+el('cashCategory').value=x.category||'';
+el('cashNote').value=x.note||'';
+showTab('cash');
 }
 
 function delCashMove(id){
-  if(confirm('Bu kasa hareketini silmek istiyor musun?')){
-    cashMoves=cashMoves.filter(x=>x.id!==id);
-    saveCash();
-    renderCashPage();
-    render();
-  }
+if(confirm('Bu kasa hareketini silmek istiyor musun?')){
+cashMoves=cashMoves.filter(x=>x.id!==id);
+saveCash();renderCashPage();render();
+}
 }
 
 function resetAll(){
-  if(confirm('Tüm iş kayıtları ve kasa hareketleri silinecek. Emin misin?')){
-    jobs=[];
-    cashMoves=[];
-    saveJobs();
-    saveCash();
-    render();
-    renderCashPage();
-  }
+if(confirm('Tüm iş kayıtları ve kasa hareketleri silinecek. Emin misin?')){
+jobs=[];cashMoves=[];
+saveJobs();saveCash();render();renderCashPage();
+}
 }
 
 function updatePrintTitle(){
-  const src=val('fSource')||'Tüm İş Kaynakları';
-  const start=val('fStart')||'Başlangıç';
-  const end=val('fEnd')||'Bugün';
-
-  el('printTitle').textContent=`${src} - Hakediş Raporu (${start} / ${end})`;
+const src=val('fSource')||'Tüm İş Kaynakları';
+const start=val('fStart')||'Başlangıç';
+const end=val('fEnd')||'Bugün';
+el('printTitle').textContent=`${src} - Hakediş Raporu (${start} / ${end})`;
 }
 
 function printReport(){
-  updatePrintTitle();
-  window.print();
+updatePrintTitle();
+showTab('home');
+setTimeout(()=>window.print(),150);
 }
 
 function exportCSV(){
-  const jobRows=filteredJobs();
-  const cashRows=filteredCashForReport();
+const jobRows=filteredJobs();
+const cashRows=filteredCashForReport();
+const rows=[];
+rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Malzeme','Net','Hakediş','Sana Kalan','Para Girişi','Ekstra Gider','Durum','Ödeme Şekli']);
 
-  const rows=[];
-  rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Malzeme','Net','Hakediş','Sana Kalan','Para Girişi','Ekstra Gider','Durum','Ödeme Şekli']);
+jobRows.forEach(x=>{
+const c=calc(x);
+rows.push(['İş Kaydı',x.date,x.source,x.serviceType,`${x.customerInfo||''} ${x.device||''} ${x.jobNote||''}`,c.collection,c.material,c.net,c.sourceShare,c.myShare,'','',x.status,x.paymentType]);
+});
 
-  jobRows.forEach(x=>{
-    const c=calc(x);
-    rows.push([
-      'İş Kaydı',
-      x.date,
-      x.source,
-      x.serviceType,
-      `${x.customerInfo||''} ${x.device||''} ${x.jobNote||''}`,
-      c.collection,
-      c.material,
-      c.net,
-      c.sourceShare,
-      c.myShare,
-      '',
-      '',
-      x.status,
-      x.paymentType
-    ]);
-  });
+cashRows.forEach(x=>{
+rows.push(['Kasa Hareketi',x.date,x.source,x.type==='in'?'Para Girişi':'Ekstra Gider',`${x.category||''} ${x.note||''}`,'','','','','',x.type==='in'?x.amount:'',x.type==='out'?x.amount:'', '',x.paymentType]);
+});
 
-  cashRows.forEach(x=>{
-    rows.push([
-      'Kasa Hareketi',
-      x.date,
-      x.source,
-      x.type==='in'?'Para Girişi':'Ekstra Gider',
-      `${x.category||''} ${x.note||''}`,
-      '',
-      '',
-      '',
-      '',
-      '',
-      x.type==='in'?x.amount:'',
-      x.type==='out'?x.amount:'',
-      '',
-      x.paymentType
-    ]);
-  });
-
-  const csv=rows.map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
-
-  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');
-
-  a.href=URL.createObjectURL(blob);
-  a.download='hakedis-raporu.csv';
-  a.click();
-
-  URL.revokeObjectURL(a.href);
+const csv=rows.map(r=>r.map(c=>'"'+String(c??'').replaceAll('"','""')+'"').join(';')).join('\n');
+const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='hakedis-raporu.csv';
+a.click();
+URL.revokeObjectURL(a.href);
 }
 
 function esc(s){
-  return String(s??'').replace(/[&<>"]/g,m=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;'
-  }[m]));
+return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 }
 
 applySettings();
@@ -1196,6 +940,7 @@ clearForm();
 clearCashForm();
 render();
 renderCashPage();
+showTab('home');
 </script>
 </body>
 </html>
