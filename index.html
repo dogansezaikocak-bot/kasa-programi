@@ -45,8 +45,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 .filters{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px}
 .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
 .done{background:#dcfae6;color:#067647}.pending{background:#fff4cc;color:#8a6100}.paid{background:#e0eaff;color:#1849a9}.cancel{background:#fee4e2;color:#b42318}
-.cashin{background:#dcfae6;color:#067647}.cashout{background:#fee4e2;color:#b42318}
-.cashmaterial{background:#fef3c7;color:#92400e}.cashhakedis{background:#ede9fe;color:#5b21b6}
+.cashin{background:#dcfae6;color:#067647}.cashout{background:#fee4e2;color:#b42318}.cashmaterial{background:#fef3c7;color:#92400e}.cashhakedis{background:#ede9fe;color:#5b21b6}
 .muted{color:var(--muted);font-size:12px}
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
 .summary .box{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px;min-width:0}
@@ -80,7 +79,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="header-inner">
 <div>
 <h1 id="appTitle">Ekzen Teknik - Hakediş Takip</h1>
-<p id="appSubtitle">İş kaynağı bazlı hakediş, ekstra gider ve ödeme raporu</p>
+<p id="appSubtitle">İş veren bazlı hakediş, ödeme ve kalan bakiye raporu</p>
 </div>
 <div class="btns">
 <button class="light" onclick="printReport()">PDF / Yazdır</button>
@@ -93,7 +92,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="wrap">
 <div class="tabs">
 <button class="tab-btn active" id="tabHomeBtn" onclick="showTab('home')">Ana Sayfa</button>
-<button class="tab-btn" id="tabJobsBtn" onclick="showTab('jobList')">İş Kayıtları</button>
+<button class="tab-btn" id="tabJobsBtn" onclick="showTab('jobList')">Servisler</button>
 <button class="tab-btn" id="tabCashBtn" onclick="showTab('cash')">Kasa Giriş / Çıkış</button>
 <button class="tab-btn" id="tabSettingsBtn" onclick="showTab('settings')">Ayarlar</button>
 </div>
@@ -103,21 +102,20 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="card stat"><small>Toplam Tahsilat</small><b id="totalCollection">₺0</b></div>
 <div class="card stat"><small>Toplam Masraf</small><b id="totalMaterial" class="danger">₺0</b></div>
 <div class="card stat"><small>Hakediş</small><b id="totalSourceShare" class="warn">₺0</b></div>
-<div class="card stat"><small>Ekstra Gider</small><b id="totalCashNet">₺0</b></div>
-<div class="card stat"><small>Ödeme Yapılacak</small><b id="totalBalance" class="warn">₺0</b></div>
+<div class="card stat"><small>Ödeme Yapıldı</small><b id="totalCashNet">₺0</b></div>
+<div class="card stat"><small>Kalan Bakiye</small><b id="totalBalance" class="warn">₺0</b></div>
 </section>
 
 <div class="home-actions no-print">
-<button class="primary" onclick="toggleSourcePanel()">İş Kaynakları</button>
+<button class="primary" onclick="toggleSourcePanel()">İş Verenler</button>
 <button class="light" onclick="showDetails()">Detay</button>
-<button class="light" onclick="openNewJob()">Yeni İş Kaydı</button>
-<button class="light" onclick="showTab('cash')">Kasa Hareketi</button>
+<button class="light" onclick="openNewJob()">Yeni Servis Kaydı</button>
 </div>
 
 <div id="sourcePanel" class="card source-panel hidden">
-<h2>İş Kaynağı Seç</h2>
+<h2>İş Veren Seç</h2>
 <select id="homeSourceSelect" onchange="selectHomeSource()"></select>
-<p class="footer">Kaynak seçince üstteki toplamlar o kaynağa göre değişir. Tümünü görmek için “Tüm kaynaklar” seç.</p>
+<p class="footer">İş veren seçince üstteki toplamlar o iş verene göre değişir. Tümünü görmek için “Tüm iş verenler” seç.</p>
 </div>
 
 <div id="detailPanel" class="card hidden" style="margin-top:14px">
@@ -135,18 +133,18 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 
 <div class="summary">
 <div class="box"><small>Hakediş</small><b id="sumSource" class="warn">₺0</b></div>
-<div class="box"><small>Ekstra Gider</small><b id="sumCashOut" class="danger">₺0</b></div>
-<div class="box"><small>Ödeme Yapılacak</small><b id="sumBalance" class="warn">₺0</b></div>
+<div class="box"><small>Ödeme Yapıldı</small><b id="sumCashOut" class="danger">₺0</b></div>
+<div class="box"><small>Kalan Bakiye</small><b id="sumBalance" class="warn">₺0</b></div>
 </div>
 
 <div class="divider"></div>
-<h2>İş Kayıtları</h2>
+<h2>Servisler</h2>
 
 <div class="tablebox">
 <table>
 <thead>
 <tr>
-<th>Tarih</th><th>Kaynak</th><th>Müşteri / Adres</th><th>İş</th>
+<th>Tarih</th><th>İş Veren</th><th>Müşteri / Adres</th><th>Servis</th>
 <th class="right">Tahsilat</th><th class="right">Masraf</th><th class="right">Hakediş</th><th>Durum</th><th class="no-print">İşlem</th>
 </tr>
 </thead>
@@ -163,7 +161,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <table>
 <thead>
 <tr>
-<th>Tarih</th><th>Kaynak</th><th>Tür</th><th>Açıklama</th><th>Ödeme Şekli</th><th class="right">Tutar</th>
+<th>Tarih</th><th>İş Veren</th><th>Tür</th><th>Açıklama</th><th>Ödeme Şekli</th><th class="right">Tutar</th>
 </tr>
 </thead>
 <tbody id="cashInReportTbody"></tbody>
@@ -177,18 +175,18 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 
 <div id="jobListPage" class="hidden">
 <div class="card">
-<h2>İş Kayıtları</h2>
+<h2>Servisler</h2>
 
 <div class="home-actions no-print">
-<button class="primary" onclick="toggleJobSourcePanel()">İş Kaynakları</button>
-<button class="light" onclick="openNewJob()">Yeni İş Kaydı Aç</button>
+<button class="primary" onclick="toggleJobSourcePanel()">İş Verenler</button>
+<button class="light" onclick="openNewJob()">Yeni Servis Kaydı Aç</button>
 <button class="light" onclick="showTab('home')">Ana Sayfa</button>
 </div>
 
 <div id="jobSourcePanel" class="card source-panel hidden">
-<h2>Kaynak Seç</h2>
+<h2>İş Veren Seç</h2>
 <select id="jobSourceSelect" onchange="renderJobListPage()"></select>
-<p class="footer">Seçtiğin kaynağın iş kayıtları aşağıda listelenir.</p>
+<p class="footer">Seçtiğin iş verenin servis kayıtları aşağıda listelenir.</p>
 </div>
 
 <div class="summary">
@@ -201,7 +199,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <table>
 <thead>
 <tr>
-<th>Tarih</th><th>Kaynak</th><th>Müşteri / Adres</th><th>İş</th>
+<th>Tarih</th><th>İş Veren</th><th>Müşteri / Adres</th><th>Servis</th>
 <th class="right">Tahsilat</th><th class="right">Masraf</th><th class="right">Hakediş</th><th>Durum</th><th class="no-print">İşlem</th>
 </tr>
 </thead>
@@ -217,7 +215,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div id="newJobPage" class="hidden">
 <section class="layout">
 <div class="card">
-<h2 id="jobFormTitle">Yeni İş Kaydı</h2>
+<h2 id="jobFormTitle">Yeni Servis Kaydı</h2>
 <input type="hidden" id="editId">
 
 <div class="row">
@@ -226,14 +224,14 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <input type="date" id="date">
 </div>
 <div>
-<label>İş Kaynağı</label>
+<label>İş Veren</label>
 <select id="source"></select>
 </div>
 </div>
 
 <div class="row">
 <div>
-<label>İş Alanı</label>
+<label>Servis Alanı</label>
 <select id="serviceType"></select>
 </div>
 <div>
@@ -277,14 +275,14 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <div class="btns">
 <button class="primary" onclick="saveJob()">Kaydet</button>
 <button class="light" onclick="clearForm()">Temizle</button>
-<button class="light" onclick="showTab('jobList')">İş Kayıtlarına Dön</button>
+<button class="light" onclick="showTab('jobList')">Servislere Dön</button>
 </div>
 
 <p class="footer">Formül: Tahsilat - Masraf = Net. Net tutarın kaynak payı hakediş olarak hesaplanır.</p>
 </div>
 
 <div class="card">
-<h2>Son İş Kayıtları</h2>
+<h2>Son Servisler</h2>
 <div class="mobile-cards" style="display:block" id="jobEntryCards"></div>
 </div>
 </section>
@@ -302,7 +300,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <input type="date" id="cashDate">
 </div>
 <div>
-<label>İş Kaynağı</label>
+<label>İş Veren</label>
 <select id="cashSource"></select>
 </div>
 </div>
@@ -335,7 +333,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <label>Açıklama</label>
-<textarea id="cashNote" placeholder="Örn: Ahmet Usta'ya ödeme yapıldı"></textarea>
+<textarea id="cashNote" placeholder="Örn: Hakediş ödemesi yapıldı"></textarea>
 
 <div class="btns">
 <button class="primary" onclick="saveCashMove()">Kaydet</button>
@@ -373,7 +371,7 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 <table>
 <thead>
 <tr>
-<th>Tarih</th><th>Kaynak</th><th>Tür</th><th>Kategori</th><th>Açıklama</th><th>Ödeme Şekli</th><th class="right">Tutar</th><th class="no-print">İşlem</th>
+<th>Tarih</th><th>İş Veren</th><th>Tür</th><th>Kategori</th><th>Açıklama</th><th>Ödeme Şekli</th><th class="right">Tutar</th><th class="no-print">İşlem</th>
 </tr>
 </thead>
 <tbody id="cashTbody"></tbody>
@@ -399,8 +397,8 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <div class="card">
-<h2>İş Kaynakları</h2>
-<label>Yeni İş Kaynağı</label>
+<h2>İş Verenler</h2>
+<label>Yeni İş Veren</label>
 <div class="row">
 <input id="newSource" placeholder="Örn: Ahmet Usta">
 <button class="primary" onclick="addSettingItem('sources','newSource')">Ekle</button>
@@ -409,8 +407,8 @@ th{font-size:12px;color:#475467;background:#f8fafc;position:sticky;top:0;z-index
 </div>
 
 <div class="card">
-<h2>İş Alanları</h2>
-<label>Yeni İş Alanı</label>
+<h2>Servis Alanları</h2>
+<label>Yeni Servis Alanı</label>
 <div class="row">
 <input id="newServiceType" placeholder="Örn: Kombi">
 <button class="primary" onclick="addSettingItem('serviceTypes','newServiceType')">Ekle</button>
@@ -457,7 +455,7 @@ const SET_KEY='ekzen_kaynak_hesap_v8_settings';
 
 const defaultSettings={
 title:'Ekzen Teknik - Hakediş Takip',
-subtitle:'İş kaynağı bazlı hakediş, ekstra gider ve ödeme raporu',
+subtitle:'İş veren bazlı hakediş, ödeme ve kalan bakiye raporu',
 defaultRate:50,
 sources:['Kaynak 1','Kaynak 2'],
 serviceTypes:['Beyaz Eşya','Kombi','Klima','Diğer'],
@@ -508,17 +506,23 @@ el('tabJobsBtn').classList.toggle('active',tab==='jobList'||tab==='newJob');
 el('tabCashBtn').classList.toggle('active',tab==='cash');
 el('tabSettingsBtn').classList.toggle('active',tab==='settings');
 
+if(tab==='home'){
+  el('fSource').value='';
+  el('homeSourceSelect').value='';
+  render();
+}
+
 if(tab==='settings') renderSettings();
 if(tab==='cash') renderCashPage();
 if(tab==='jobList') renderJobListPage();
 if(tab==='newJob') renderJobEntryCards();
-if(tab==='home') render();
+
 window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function openNewJob(){
 clearForm();
-el('jobFormTitle').textContent='Yeni İş Kaydı';
+el('jobFormTitle').textContent='Yeni Servis Kaydı';
 showTab('newJob');
 }
 
@@ -544,20 +548,20 @@ function applySettings(){
 el('appTitle').textContent=settings.title;
 el('appSubtitle').textContent=settings.subtitle;
 
-fillSelect('source',settings.sources,'İş kaynağı seç');
-fillSelect('cashSource',settings.sources,'İş kaynağı seç');
+fillSelect('source',settings.sources,'İş veren seç');
+fillSelect('cashSource',settings.sources,'İş veren seç');
 fillSelect('serviceType',settings.serviceTypes);
 fillSelect('status',settings.statuses);
 fillSelect('paymentType',settings.paymentTypes);
 fillSelect('cashPaymentType',settings.paymentTypes);
 
-fillSelect('fSource',['',...settings.sources],'Tüm kaynaklar');
-fillSelect('homeSourceSelect',['',...settings.sources],'Tüm kaynaklar');
-fillSelect('jobSourceSelect',['',...settings.sources],'Tüm kaynaklar');
+fillSelect('fSource',['',...settings.sources],'Tüm iş verenler');
+fillSelect('homeSourceSelect',['',...settings.sources],'Tüm iş verenler');
+fillSelect('jobSourceSelect',['',...settings.sources],'Tüm iş verenler');
 fillSelect('fStatus',['',...settings.statuses],'Tüm durumlar');
-fillSelect('fService',['',...settings.serviceTypes],'Tüm işler');
+fillSelect('fService',['',...settings.serviceTypes],'Tüm servisler');
 
-fillSelect('cfSource',['',...settings.sources],'Tüm kaynaklar');
+fillSelect('cfSource',['',...settings.sources],'Tüm iş verenler');
 fillSelect('cfPayment',['',...settings.paymentTypes],'Tüm ödeme şekilleri');
 
 el('setTitle').value=settings.title;
@@ -647,7 +651,7 @@ el(listId).innerHTML=settings[type].map((item,index)=>`
 }
 
 function resetSettings(){
-if(!confirm('Ayarlar varsayılana dönecek. İş ve kasa kayıtların silinmez. Emin misin?'))return;
+if(!confirm('Ayarlar varsayılana dönecek. Servis ve kasa kayıtların silinmez. Emin misin?'))return;
 settings={...defaultSettings};
 saveSettings();applySettings();renderSettings();render();renderCashPage();renderJobListPage();
 }
@@ -658,28 +662,7 @@ const material=Number(j.material||0);
 const rate=Number(j.sourceRate||settings.defaultRate||50);
 const net=Math.max(collection-material,0);
 const sourceShare=net*rate/100;
-const myShare=net-sourceShare;
-return{collection,material,rate,net,sourceShare,myShare};
-}
-
-function sourceBalance(source){
-let hak=0,cashIn=0,cashOut=0;
-
-jobs.filter(x=>x.status!=='İptal' && (!source || x.source===source)).forEach(x=>{
-  hak+=calc(x).sourceShare;
-});
-
-cashMoves.filter(x=>(!source || x.source===source)).forEach(x=>{
-  if(isCashIn(x)) cashIn+=Number(x.amount||0);
-  if(isCashOut(x)) cashOut+=Number(x.amount||0);
-});
-
-return {
-  hak,
-  cashIn,
-  cashOut,
-  balance: hak + cashIn - cashOut
-};
+return{collection,material,rate,net,sourceShare};
 }
 
 function sourceRemainingHakedis(source){
@@ -698,7 +681,7 @@ return Math.max(totalHakedis-paidHakedis,0);
 }
 
 function saveJob(){
-if(!val('date')||!val('source')){alert('Tarih ve iş kaynağı zorunlu.');return}
+if(!val('date')||!val('source')){alert('Tarih ve iş veren zorunlu.');return}
 const collection=parseFloat(val('collection')||0);
 const material=parseFloat(val('material')||0);
 if(collection<0||material<0){alert('Tutarlar eksi olamaz.');return}
@@ -737,7 +720,7 @@ el('serviceType').value=settings.serviceTypes[0]||'';
 el('sourceRate').value=settings.defaultRate||50;
 el('status').value=settings.statuses[0]||'';
 el('paymentType').value=settings.paymentTypes[0]||'';
-el('jobFormTitle').textContent='Yeni İş Kaydı';
+el('jobFormTitle').textContent='Yeni Servis Kaydı';
 }
 
 function filteredJobs(){
@@ -814,7 +797,7 @@ const balance=sourceShareTotal+cashIn-cashOut;
 el('sumSource').textContent=fmt(sourceShareTotal);
 el('sumCashOut').textContent=fmt(cashOut);
 el('sumBalance').textContent=fmt(balance);
-el('countText').textContent=`${rows.length} iş kaydı, ${cashRows.length} kasa hareketi listeleniyor.`;
+el('countText').textContent=`${rows.length} servis kaydı, ${cashRows.length} kasa hareketi listeleniyor.`;
 
 updateStats();
 updatePrintTitle();
@@ -844,7 +827,7 @@ card.innerHTML=`
 <span class="pill ${statusClass(x.status)}">${esc(x.status)}</span>
 </div>
 <p><b>Müşteri / Adres:</b> ${esc(x.customerInfo)||'-'}</p>
-<p><b>İş:</b> ${esc(x.serviceType)} - ${esc(x.device)||'-'}</p>
+<p><b>Servis:</b> ${esc(x.serviceType)} - ${esc(x.device)||'-'}</p>
 <p><b>Açıklama:</b> ${esc(x.jobNote)||'-'}</p>
 <div class="money-grid">
 <div><small>Tahsilat</small><b class="ok">${fmt(c.collection)}</b></div>
@@ -879,7 +862,7 @@ cards.appendChild(jobCard(x,c));
 el('jobListCollection').textContent=fmt(totalCollection);
 el('jobListMaterial').textContent=fmt(totalMaterial);
 el('jobListShare').textContent=fmt(totalShare);
-el('jobListCount').textContent=`${rows.length} iş kaydı listeleniyor.`;
+el('jobListCount').textContent=`${rows.length} servis kaydı listeleniyor.`;
 }
 
 function renderJobEntryCards(){
@@ -903,13 +886,13 @@ if(isCashIn(x))cashIn+=Number(x.amount||0);
 if(isCashOut(x))cashOut+=Number(x.amount||0);
 });
 
-const ekstraGider=cashOut-cashIn;
+const odemeYapildi=cashOut-cashIn;
 const balance=hak+cashIn-cashOut;
 el('totalCollection').textContent=fmt(tc);
 el('totalMaterial').textContent=fmt(tm);
 el('totalSourceShare').textContent=fmt(hak);
-el('totalCashNet').textContent=fmt(ekstraGider);
-el('totalCashNet').className=ekstraGider>=0?'danger':'ok';
+el('totalCashNet').textContent=fmt(odemeYapildi);
+el('totalCashNet').className=odemeYapildi>=0?'danger':'ok';
 el('totalBalance').textContent=fmt(balance);
 }
 
@@ -928,12 +911,12 @@ el('material').value=x.material||'';
 el('sourceRate').value=x.sourceRate||settings.defaultRate||50;
 el('status').value=x.status;
 el('paymentType').value=x.paymentType;
-el('jobFormTitle').textContent='İş Kaydını Düzenle';
+el('jobFormTitle').textContent='Servis Kaydını Düzenle';
 showTab('newJob');
 }
 
 function delJob(id){
-if(confirm('Bu iş kaydını silmek istiyor musun?')){
+if(confirm('Bu servis kaydını silmek istiyor musun?')){
 jobs=jobs.filter(x=>x.id!==id);
 saveJobs();
 render();
@@ -944,7 +927,7 @@ renderCashPage();
 }
 
 function saveCashMove(){
-if(!val('cashDate')||!val('cashSource')){alert('Tarih ve iş kaynağı zorunlu.');return}
+if(!val('cashDate')||!val('cashSource')){alert('Tarih ve iş veren zorunlu.');return}
 const amount=parseFloat(val('cashAmount')||0);
 if(!amount||amount<=0){alert('Tutar sıfırdan büyük olmalı.');return}
 
@@ -1051,7 +1034,7 @@ render();
 }
 
 function resetAll(){
-if(confirm('Tüm iş kayıtları ve kasa hareketleri silinecek. Emin misin?')){
+if(confirm('Tüm servis kayıtları ve kasa hareketleri silinecek. Emin misin?')){
 jobs=[];
 cashMoves=[];
 saveJobs();
@@ -1063,7 +1046,7 @@ renderJobListPage();
 }
 
 function updatePrintTitle(){
-const src=val('fSource')||'Tüm İş Kaynakları';
+const src=val('fSource')||'Tüm İş Verenler';
 const start=val('fStart')||'Başlangıç';
 const end=val('fEnd')||'Bugün';
 el('printTitle').textContent=`${src} - Hakediş Raporu (${start} / ${end})`;
@@ -1080,11 +1063,11 @@ function exportCSV(){
 const jobRows=filteredJobs();
 const cashRows=filteredCashForReport();
 const rows=[];
-rows.push(['BÖLÜM','Tarih','İş Kaynağı','Tür','Açıklama','Tahsilat','Masraf','Net','Hakediş','Para Girişi','Kasa Eksi','Durum','Ödeme Şekli']);
+rows.push(['BÖLÜM','Tarih','İş Veren','Tür','Açıklama','Tahsilat','Masraf','Net','Hakediş','Para Girişi','Ödeme Yapıldı','Durum','Ödeme Şekli']);
 
 jobRows.forEach(x=>{
 const c=calc(x);
-rows.push(['İş Kaydı',x.date,x.source,x.serviceType,`${x.customerInfo||''} ${x.device||''} ${x.jobNote||''}`,c.collection,c.material,c.net,c.sourceShare,'','',x.status,x.paymentType]);
+rows.push(['Servis Kaydı',x.date,x.source,x.serviceType,`${x.customerInfo||''} ${x.device||''} ${x.jobNote||''}`,c.collection,c.material,c.net,c.sourceShare,'','',x.status,x.paymentType]);
 });
 
 cashRows.forEach(x=>{
